@@ -1,0 +1,12 @@
+{
+  "name": "client-demo-2",
+  "version": "0.1.0",
+  "description": "Simulasi aplikasi client kedua (Sistem Inventaris) untuk uji coba SSO",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

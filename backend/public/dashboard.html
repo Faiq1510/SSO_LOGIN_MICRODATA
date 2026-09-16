@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SSO Admin</title>
+    <style>
+      :root {
+        --bg: #0f1115;
+        --panel: #171a21;
+        --panel-2: #1d212a;
+        --border: #262b35;
+        --text: #e6e8eb;
+        --text-dim: #8b93a1;
+        --accent: #2dd4bf;
+        --accent-dim: #163b37;
+        --danger: #ef4444;
+        --danger-dim: #3a1a1a;
+        --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        --sans: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--sans);
+        min-height: 100vh;
+      }
+
+      /* ---- Login screen ---- */
+      #loginScreen {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #loginScreen.hidden {
+        display: none;
+      }
+      .login-box {
+        width: 320px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 28px;
+      }
+      .login-box h1 {
+        font-size: 16px;
+        margin: 0 0 4px;
+      }
+      .login-box p {
+        color: var(--text-dim);
+        font-size: 13px;
+        margin: 0 0 20px;
+      }
+      .login-box label {
+        display: block;
+        font-size: 12px;
+        color: var(--text-dim);
+        margin-bottom: 5px;
+      }
+      .login-box input {
+        width: 100%;
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 9px 10px;
+        border-radius: 6px;
+        font-size: 13.5px;
+        margin-bottom: 14px;
+      }
+      .login-box input:focus {
+        outline: 1px solid var(--accent);
+        border-color: var(--accent);
+      }
+      .login-error {
+        display: none;
+        background: var(--danger-dim);
+        color: #ff9d9d;
+        font-size: 12.5px;
+        padding: 9px 10px;
+        border-radius: 6px;
+        margin-bottom: 14px;
+      }
+      .login-error.show {
+        display: block;
+      }
+
+      /* ---- App shell ---- */
+      #app {
+        display: flex;
+        min-height: 100vh;
+      }
+      #app.hidden {
+        display: none;
+      }
+      aside {
+        width: 220px;
+        flex-shrink: 0;
+        background: var(--panel);
+        border-right: 1px solid var(--border);
+        padding: 20px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      aside h1 {
+        font-size: 15px;
+        font-weight: 600;
+        margin: 0;
+        letter-spacing: -0.01em;
+      }
+      aside h1 span {
+        color: var(--text-dim);
+        font-weight: 400;
+      }
+      nav {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      nav button {
+        all: unset;
+        padding: 8px 10px;
+        border-radius: 6px;
+        font-size: 13.5px;
+        color: var(--text-dim);
+        cursor: pointer;
+      }
+      nav button:hover {
+        background: var(--panel-2);
+        color: var(--text);
+      }
+      nav button.active {
+        background: var(--accent-dim);
+        color: var(--accent);
+      }
+
+      .account-box {
+        margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .account-box .who {
+        font-size: 12px;
+        color: var(--text-dim);
+      }
+      .account-box .who b {
+        color: var(--text);
+      }
+      .account-box button {
+        all: unset;
+        cursor: pointer;
+        font-size: 12.5px;
+        color: var(--text-dim);
+        padding: 6px 0;
+      }
+      .account-box button:hover {
+        color: var(--danger);
+      }
+
+      main {
+        flex: 1;
+        padding: 32px 40px;
+        max-width: 920px;
+      }
+      .view {
+        display: none;
+      }
+      .view.active {
+        display: block;
+      }
+      h2 {
+        font-size: 20px;
+        margin: 0 0 4px;
+      }
+      .subtitle {
+        color: var(--text-dim);
+        font-size: 13.5px;
+        margin: 0 0 24px;
+      }
+
+      form.add-form {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 20px;
+      }
+      form.add-form .full {
+        grid-column: 1 / -1;
+      }
+      form.add-form label {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        font-size: 12px;
+        color: var(--text-dim);
+      }
+      form.add-form input {
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 8px 9px;
+        border-radius: 6px;
+        font-size: 13px;
+      }
+      form.add-form input:focus {
+        outline: 1px solid var(--accent);
+        border-color: var(--accent);
+      }
+      .btn {
+        all: unset;
+        cursor: pointer;
+        padding: 8px 14px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        text-align: center;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #06201d;
+        width: 100%;
+      }
+      .btn-primary:hover {
+        filter: brightness(1.08);
+      }
+      .btn-danger {
+        background: var(--danger-dim);
+        color: #ff9d9d;
+        padding: 5px 10px;
+        font-size: 12px;
+      }
+      .btn-danger:hover {
+        filter: brightness(1.2);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      th {
+        text-align: left;
+        font-size: 11px;
+        color: var(--text-dim);
+        font-weight: 500;
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--border);
+      }
+      td {
+        padding: 10px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+      }
+      td.mono,
+      code {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text-dim);
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      .empty {
+        color: var(--text-dim);
+        font-size: 13px;
+        padding: 20px 4px;
+      }
+
+      .banner {
+        padding: 12px 14px;
+        border-radius: 8px;
+        font-size: 13px;
+        margin-bottom: 16px;
+        display: none;
+      }
+      .banner.show {
+        display: block;
+      }
+      .banner.error {
+        background: var(--danger-dim);
+        color: #ff9d9d;
+      }
+      .banner.secret {
+        background: var(--accent-dim);
+        color: var(--accent);
+      }
+      .banner.secret code {
+        color: var(--accent);
+        word-break: break-all;
+      }
+      .banner .close {
+        float: right;
+        cursor: pointer;
+        opacity: 0.7;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loginScreen">
+      <div class="login-box">
+        <h1>SSO Admin</h1>
+        <p>Masuk untuk mengelola user dan client.</p>
+        <div id="loginError" class="login-error"></div>
+        <form id="loginForm">
+          <label>Username</label>
+          <input name="username" autocomplete="username" required />
+          <label>Password</label>
+          <input
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
+          <button class="btn btn-primary" type="submit">Masuk</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="app" class="hidden">
+      <aside>
+        <h1>SSO <span>Admin</span></h1>
+        <nav>
+          <button data-view="users" class="active">Users</button>
+          <button data-view="clients">Clients</button>
+        </nav>
+        <div class="account-box">
+          <div class="who">Masuk sebagai <b id="whoAmI">-</b></div>
+          <button id="logoutBtn">Logout</button>
+        </div>
+      </aside>
+
+      <main>
+        <section id="view-users" class="view active">
+          <h2>Users</h2>
+          <p class="subtitle">Daftar akun yang bisa login lewat SSO ini.</p>
+
+          <div id="userBanner" class="banner error">
+            <span class="close" onclick="hideBanner('userBanner')">✕</span
+            ><span class="msg"></span>
+          </div>
+
+          <form class="add-form" id="userForm">
+            <label class="full"
+              >Username<input name="username" required
+            /></label>
+            <label
+              >Password<input name="password" type="password" required
+            /></label>
+            <label>Nama<input name="name" required /></label>
+            <label class="full"
+              >Email<input name="email" type="email" required
+            /></label>
+            <div class="full" style="margin-top: 4px">
+              <button class="btn btn-primary" style="width: auto" type="submit">
+                Tambah user
+              </button>
+            </div>
+          </form>
+
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Nama</th>
+                <th>Email</th>
+                <th>Dibuat</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="userRows"></tbody>
+          </table>
+          <div id="userEmpty" class="empty" style="display: none">
+            Belum ada user. Tambahkan lewat form di atas.
+          </div>
+        </section>
+
+        <section id="view-clients" class="view">
+          <h2>Clients</h2>
+          <p class="subtitle">Aplikasi yang terdaftar untuk memakai SSO ini.</p>
+
+          <div id="clientBanner" class="banner error">
+            <span class="close" onclick="hideBanner('clientBanner')">✕</span
+            ><span class="msg"></span>
+          </div>
+          <div id="secretBanner" class="banner secret">
+            <span class="close" onclick="hideBanner('secretBanner')">✕</span
+            ><span class="msg"></span>
+          </div>
+
+          <form class="add-form" id="clientForm">
+            <label>Client ID<input name="client_id" required /></label>
+            <label>Nama aplikasi<input name="name" required /></label>
+            <label class="full"
+              >Redirect URI<input
+                name="redirect_uri"
+                placeholder="http://localhost:6000/callback"
+                required
+            /></label>
+            <label class="full"
+              >Post-logout redirect URI (opsional)<input
+                name="post_logout_redirect_uri"
+                placeholder="http://localhost:6000/"
+            /></label>
+            <div class="full" style="margin-top: 4px">
+              <button class="btn btn-primary" style="width: auto" type="submit">
+                Daftarkan client
+              </button>
+            </div>
+          </form>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Client ID</th>
+                <th>Nama</th>
+                <th>Redirect URI</th>
+                <th>Dibuat</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="clientRows"></tbody>
+          </table>
+          <div id="clientEmpty" class="empty" style="display: none">
+            Belum ada client terdaftar.
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const loginScreen = document.getElementById("loginScreen");
+      const appEl = document.getElementById("app");
+
+      function showApp(username) {
+        loginScreen.classList.add("hidden");
+        appEl.classList.remove("hidden");
+        document.getElementById("whoAmI").textContent = username;
+        loadUsers();
+        loadClients();
+      }
+      function showLogin() {
+        appEl.classList.add("hidden");
+        loginScreen.classList.remove("hidden");
+      }
+
+      async function checkAuth() {
+        try {
+          const res = await fetch("/admin/me");
+          if (!res.ok) return showLogin();
+          const data = await res.json();
+          showApp(data.username);
+        } catch {
+          showLogin();
+        }
+      }
+
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const form = e.target;
+          const body = Object.fromEntries(new FormData(form).entries());
+          const errorBox = document.getElementById("loginError");
+          errorBox.classList.remove("show");
+          try {
+            const res = await fetch("/admin/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(body),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Login gagal");
+            form.reset();
+            showApp(data.username);
+          } catch (err) {
+            errorBox.textContent = err.message;
+            errorBox.classList.add("show");
+          }
+        });
+
+      document
+        .getElementById("logoutBtn")
+        .addEventListener("click", async () => {
+          await fetch("/admin/logout", { method: "POST" });
+          showLogin();
+        });
+
+      function showBanner(id, message, isError = true) {
+        const el = document.getElementById(id);
+        el.querySelector(".msg").textContent = message;
+        el.classList.add("show");
+        if (!isError) el.classList.remove("error");
+      }
+      function hideBanner(id) {
+        document.getElementById(id).classList.remove("show");
+      }
+
+      async function api(path, options = {}) {
+        const res = await fetch(path, {
+          ...options,
+          headers: {
+            ...(options.body ? { "Content-Type": "application/json" } : {}),
+            ...options.headers,
+          },
+        });
+        if (res.status === 401) {
+          showLogin();
+          throw new Error("Sesi berakhir, silakan login lagi.");
+        }
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok)
+          throw new Error(data.error || `Request gagal (${res.status})`);
+        return data;
+      }
+
+      // ---- Navigation ----
+      document.querySelectorAll("nav button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll("nav button")
+            .forEach((b) => b.classList.remove("active"));
+          document
+            .querySelectorAll(".view")
+            .forEach((v) => v.classList.remove("active"));
+          btn.classList.add("active");
+          document
+            .getElementById("view-" + btn.dataset.view)
+            .classList.add("active");
+        });
+      });
+
+      // ---- Users ----
+      async function loadUsers() {
+        hideBanner("userBanner");
+        try {
+          const { users } = await api("/admin/users");
+          const rows = document.getElementById("userRows");
+          rows.innerHTML = "";
+          document.getElementById("userEmpty").style.display = users.length
+            ? "none"
+            : "block";
+          for (const u of users) {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+          <td class="mono">${u.id}</td>
+          <td>${u.username}</td>
+          <td>${u.name ?? ""}</td>
+          <td>${u.email ?? ""}</td>
+          <td class="mono">${new Date(u.created_at).toLocaleDateString()}</td>
+          <td><button class="btn btn-danger" data-id="${u.id}">Hapus</button></td>
+        `;
+            tr.querySelector("button").addEventListener("click", () =>
+              deleteUser(u.id),
+            );
+            rows.appendChild(tr);
+          }
+        } catch (err) {
+          showBanner("userBanner", err.message);
+        }
+      }
+
+      document
+        .getElementById("userForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const form = e.target;
+          const body = Object.fromEntries(new FormData(form).entries());
+          try {
+            await api("/admin/users", {
+              method: "POST",
+              body: JSON.stringify(body),
+            });
+            form.reset();
+            loadUsers();
+          } catch (err) {
+            showBanner("userBanner", err.message);
+          }
+        });
+
+      async function deleteUser(id) {
+        if (!confirm("Hapus user ini?")) return;
+        try {
+          await api(`/admin/users/${id}`, { method: "DELETE" });
+          loadUsers();
+        } catch (err) {
+          showBanner("userBanner", err.message);
+        }
+      }
+
+      // ---- Clients ----
+      async function loadClients() {
+        hideBanner("clientBanner");
+        try {
+          const { clients } = await api("/admin/clients");
+          const rows = document.getElementById("clientRows");
+          rows.innerHTML = "";
+          document.getElementById("clientEmpty").style.display = clients.length
+            ? "none"
+            : "block";
+          for (const c of clients) {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+          <td class="mono">${c.client_id}</td>
+          <td>${c.name ?? ""}</td>
+          <td class="mono">${c.redirect_uri}</td>
+          <td class="mono">${new Date(c.created_at).toLocaleDateString()}</td>
+          <td><button class="btn btn-danger" data-id="${c.client_id}">Hapus</button></td>
+        `;
+            tr.querySelector("button").addEventListener("click", () =>
+              deleteClient(c.client_id),
+            );
+            rows.appendChild(tr);
+          }
+        } catch (err) {
+          showBanner("clientBanner", err.message);
+        }
+      }
+
+      document
+        .getElementById("clientForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const form = e.target;
+          const body = Object.fromEntries(new FormData(form).entries());
+          if (!body.post_logout_redirect_uri)
+            delete body.post_logout_redirect_uri;
+          try {
+            const result = await api("/admin/clients", {
+              method: "POST",
+              body: JSON.stringify(body),
+            });
+            form.reset();
+            showBanner(
+              "secretBanner",
+              `Client "${result.client.client_id}" dibuat. Catat client_secret ini sekarang, tidak akan ditampilkan lagi: ${result.client_secret}`,
+              false,
+            );
+            loadClients();
+          } catch (err) {
+            showBanner("clientBanner", err.message);
+          }
+        });
+
+      async function deleteClient(clientId) {
+        if (!confirm(`Hapus client "${clientId}"?`)) return;
+        try {
+          await api(`/admin/clients/${clientId}`, { method: "DELETE" });
+          loadClients();
+        } catch (err) {
+          showBanner("clientBanner", err.message);
+        }
+      }
+
+      checkAuth();
+    </script>
+  </body>
+</html>
