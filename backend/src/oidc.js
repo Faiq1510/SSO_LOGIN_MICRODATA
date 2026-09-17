@@ -18,12 +18,14 @@ async function createOidcProvider() {
     response_types: ["code"],
   }));
 
-  const oidc = new Provider("http://localhost:3000", {
+  const oidc = new Provider(process.env.ISSUER || "http://localhost:3000", {
     clients,
     adapter: PostgresAdapter,
     jwks: JSON.parse(process.env.OIDC_JWKS),
     cookies: {
       keys: [process.env.COOKIES_KEY],
+      long: { signed: true, sameSite: "none", secure: true },
+      short: { signed: true, sameSite: "none", secure: true },
     },
     claims: {
       openid: ["sub"],
@@ -59,6 +61,12 @@ async function createOidcProvider() {
     features: {
       devInteractions: { enabled: false },
     },
+  });
+
+  oidc.proxy = true;
+
+  oidc.on("server_error", (ctx, err) => {
+    console.error("OIDC SERVER ERROR:", err);
   });
 
   return oidc;

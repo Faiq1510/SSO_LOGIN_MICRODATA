@@ -1,5 +1,6 @@
 const express = require("express");
 const path = require("path");
+const cors = require("cors");
 const { Pool } = require("pg");
 const createOidcProvider = require("./oidc");
 const createInteractionRouter = require("./interaction");
@@ -7,6 +8,16 @@ const adminRouter = require("./admin");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// 0. WAJIB paling atas, sebelum middleware/router lain
+app.set("trust proxy", true);
+
+app.use(
+  cors({
+    origin: process.env.FRONTEND_ORIGIN,
+    credentials: true,
+  }),
+);
 
 // 1. Parsing Body (Wajib di atas router)
 app.use(express.json());
@@ -17,6 +28,8 @@ app.use(express.static(path.join(__dirname, "../public")));
 
 // 3. Routers
 app.use("/admin", adminRouter);
+
+// ... sisanya tetap sama persis, tidak ada perubahan lain
 
 // Database Pool
 const pool = new Pool({
