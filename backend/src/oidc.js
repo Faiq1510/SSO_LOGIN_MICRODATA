@@ -1,6 +1,32 @@
 const { Provider } = require("oidc-provider");
+const fs = require("fs");
+const path = require("path");
 const pool = require("./db");
 const PostgresAdapter = require("./oidc-adapter");
+
+const logoutTemplate = fs.readFileSync(
+  path.join(__dirname, "../public/logout/logout.html"),
+  "utf8",
+);
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>'"]/g, (character) => {
+    const entities = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      "'": "&#39;",
+      '"': "&quot;",
+    };
+    return entities[character];
+  });
+}
+
+function renderLogoutPage(ctx, form) {
+  return logoutTemplate
+    .replace("__LOGOUT_HOST__", escapeHtml(ctx.host))
+    .replace("__LOGOUT_FORM__", form);
+}
 
 async function createOidcProvider() {
   const result = await pool.query(
@@ -60,6 +86,12 @@ async function createOidcProvider() {
 
     features: {
       devInteractions: { enabled: false },
+      rpInitiatedLogout: {
+        enabled: true,
+        logoutSource(ctx, form) {
+          ctx.body = renderLogoutPage(ctx, form);
+        },
+      },
     },
   });
 

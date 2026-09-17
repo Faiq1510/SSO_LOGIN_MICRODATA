@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#102a43" />
+    <title>Logout | microdata</title>
+    <link rel="stylesheet" href="/logout/logout.css" />
+  </head>
+  <body>
+    <main class="logout-shell">
+      <header class="topbar">
+        <div class="brand-lockup">
+          <span class="brand-mark" aria-hidden="true">m</span>
+          <span class="brand-name">microdata</span>
+        </div>
+        <span class="secure-label"><span></span> Identity Cloud</span>
+      </header>
+
+      <section class="logout-card">
+        <div class="logout-icon" aria-hidden="true">
+          <span></span>
+          <span></span>
+        </div>
+        <p class="eyebrow">MICRODATA IDENTITY CLOUD</p>
+        <h1>Ready to sign out?</h1>
+        <p class="intro">
+          Kamu akan keluar dari sesi microdata pada perangkat ini.
+        </p>
+        <div class="account-strip">
+          <span class="account-dot" aria-hidden="true"></span>
+          <div><strong>Active session</strong><span>Protected by microdata</span></div>
+        </div>
+
+        __LOGOUT_FORM__
+
+        <div class="logout-actions">
+          <button class="signout-button" autofocus type="submit" form="op.logoutForm" value="yes" name="logout">
+            Logout
+          </button>
+          <button class="stay-button" type="submit" form="op.logoutForm">
+            Tetap masuk
+          </button>
+        </div>
+        <p class="privacy-note">Sesi kamu tetap aman selama proses ini.</p>
+      </section>
+
+      <footer class="footer">microdata identity platform <span>&middot;</span> secure session control</footer>
+    </main>
+    <script src="/logout/logout.js" defer></script>
+  </body>
+</html>

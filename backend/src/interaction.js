@@ -1,6 +1,69 @@
+/** @format */
+
 const express = require("express");
 const bcrypt = require("bcrypt");
+const fs = require("fs");
+const path = require("path");
 const pool = require("./db");
+
+const loginTemplate = fs.readFileSync(
+  path.join(__dirname, "../public/login/login.html"),
+  "utf8",
+);
+const consentTemplate = fs.readFileSync(
+  path.join(__dirname, "../public/consent/consent.html"),
+  "utf8",
+);
+
+function renderLoginPage(uid, showError = false) {
+  return loginTemplate
+    .replace("__LOGIN_ACTION__", `/oidc/interaction/${uid}/login`)
+    .replace(
+      '<div class="alert" role="alert" aria-live="polite" hidden>',
+      `<div class="alert" role="alert" aria-live="polite"${showError ? "" : " hidden"}>`,
+    );
+}
+
+function renderConsentPage(uid) {
+  return consentTemplate.replace(
+    "__CONSENT_ACTION__",
+    `/oidc/interaction/${uid}/confirm`,
+  );
+}
+
+function renderExpiredInteractionPage() {
+  return `
+    <!doctype html>
+    <html lang="id">
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Sesi Berakhir | microdata</title>
+        <link rel="stylesheet" href="/consent/consent.css" />
+      </head>
+      <body>
+        <main class="consent-shell">
+          <header class="topbar">
+            <div class="brand-lockup">
+              <span class="brand-mark" aria-hidden="true">m</span>
+              <span class="brand-name">microdata</span>
+            </div>
+          </header>
+          <section class="consent-card expired-card">
+            <div class="icon-orbit" aria-hidden="true"><div class="app-icon">!</div></div>
+            <p class="eyebrow">SESSION ENDED</p>
+            <h1>Sesi sudah berakhir</h1>
+            <p class="intro">Permintaan login ini sudah digunakan atau kedaluwarsa. Mulai login dari aplikasi kembali.</p>
+          </section>
+        </main>
+      </body>
+    </html>
+  `;
+}
+
+function isExpiredInteractionError(err) {
+  return err?.name === "SessionNotFound" || err?.message?.includes("SessionNotFound");
+}
 
 function createInteractionRouter(oidc) {
   const router = express.Router();
@@ -10,40 +73,20 @@ function createInteractionRouter(oidc) {
       const { uid, prompt } = await oidc.interactionDetails(req, res);
 
       if (prompt.name === "login") {
-        res.send(`
-          <html>
-            <body style="font-family: sans-serif; max-width: 400px; margin: 100px auto;">
-              <h2>Login</h2>
-              <form method="post" action="/oidc/interaction/${uid}/login">
-                <div><input type="text" name="username" placeholder="Username" required /></div>
-                <div style="margin-top:10px">
-                  <input type="password" name="password" placeholder="Password" required />
-                </div>
-                <button type="submit" style="margin-top:15px">Masuk</button>
-              </form>
-            </body>
-          </html>
-        `);
+        res.send(renderLoginPage(uid));
         return;
       }
 
       if (prompt.name === "consent") {
-        res.send(`
-          <html>
-            <body style="font-family: sans-serif; max-width: 400px; margin: 100px auto;">
-              <h2>Izinkan Akses</h2>
-              <p>Aplikasi meminta akses ke profil dasar kamu.</p>
-              <form method="post" action="/oidc/interaction/${uid}/confirm">
-                <button type="submit">Setujui</button>
-              </form>
-            </body>
-          </html>
-        `);
+        res.send(renderConsentPage(uid));
         return;
       }
 
       next(new Error("Prompt tidak dikenal"));
     } catch (err) {
+      if (isExpiredInteractionError(err)) {
+        return res.status(400).send(renderExpiredInteractionPage());
+      }
       next(err);
     }
   });
@@ -67,21 +110,7 @@ function createInteractionRouter(oidc) {
           : await bcrypt.compare(password, "$2b$10$invalidsaltinvalidsaltin");
 
         if (!user || !passwordMatches) {
-          return res.send(`
-            <html>
-              <body style="font-family: sans-serif; max-width: 400px; margin: 100px auto;">
-                <h2>Login</h2>
-                <p style="color:red;">Username atau password salah.</p>
-                <form method="post" action="/oidc/interaction/${uid}/login">
-                  <div><input type="text" name="username" placeholder="Username" required /></div>
-                  <div style="margin-top:10px">
-                    <input type="password" name="password" placeholder="Password" required />
-                  </div>
-                  <button type="submit" style="margin-top:15px">Masuk</button>
-                </form>
-              </body>
-            </html>
-          `);
+          return res.send(renderLoginPage(uid, true));
         }
 
         const loginResult = {
@@ -91,6 +120,9 @@ function createInteractionRouter(oidc) {
           mergeWithLastSubmission: false,
         });
       } catch (err) {
+        if (isExpiredInteractionError(err)) {
+          return res.status(400).send(renderExpiredInteractionPage());
+        }
         next(err);
       }
     },
@@ -112,6 +144,9 @@ function createInteractionRouter(oidc) {
         mergeWithLastSubmission: true,
       });
     } catch (err) {
+      if (isExpiredInteractionError(err)) {
+        return res.status(400).send(renderExpiredInteractionPage());
+      }
       next(err);
     }
   });

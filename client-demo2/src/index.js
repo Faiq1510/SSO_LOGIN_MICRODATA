@@ -1,3 +1,5 @@
+/** @format */
+
 const express = require("express");
 const crypto = require("crypto");
 
@@ -5,7 +7,7 @@ const app = express();
 const PORT = 5000;
 
 // ==== Konfigurasi, sesuai entri "client-inventaris" di backend/src/oidc.js ====
-const IDP_ISSUER = "http://localhost:3000";
+const IDP_ISSUER = "https://magnesium-calamity-stipend.ngrok-free.dev";
 const CLIENT_ID = "client-inventaris";
 const CLIENT_SECRET = "secret-inventaris";
 const REDIRECT_URI = "http://localhost:5000/callback";

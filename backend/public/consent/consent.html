@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#102a43" />
+    <title>Persetujuan Akses | microdata</title>
+    <link rel="stylesheet" href="/consent/consent.css" />
+  </head>
+  <body>
+    <main class="consent-shell">
+      <header class="topbar">
+        <div class="brand-lockup">
+          <span class="brand-mark" aria-hidden="true">m</span>
+          <span class="brand-name">microdata</span>
+        </div>
+        <span class="secure-label"><span></span> Secure identity</span>
+      </header>
+
+      <section class="consent-card">
+        <div class="icon-orbit" aria-hidden="true">
+          <div class="app-icon">M</div>
+        </div>
+        <p class="eyebrow">PERMISSION REQUEST</p>
+        <h1>Izinkan akses?</h1>
+        <p class="intro">
+          Aplikasi ini meminta izin untuk melanjutkan proses masuk melalui
+          microdata Identity Cloud.
+        </p>
+
+        <div class="access-row">
+          <div class="access-icon" aria-hidden="true">i</div>
+          <div>
+            <strong>Profil dasar</strong>
+            <span>Identitas akun untuk pengalaman yang personal</span>
+          </div>
+          <span class="check" aria-hidden="true">&#10003;</span>
+        </div>
+
+        <form method="post" action="__CONSENT_ACTION__" class="consent-form">
+          <button class="approve-button" type="submit">
+            <span>Izinkan dan lanjutkan</span>
+          </button>
+          <p class="privacy-note">Data kamu tetap terlindungi dan hanya digunakan sesuai kebutuhan akses.</p>
+        </form>
+      </section>
+
+      <footer class="footer">microdata identity platform <span>&middot;</span> protected connection</footer>
+    </main>
+    <script src="/consent/consent.js" defer></script>
+  </body>
+</html>
