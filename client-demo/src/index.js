@@ -1,5 +1,5 @@
 /** @format */
-
+require("dotenv").config();
 const express = require("express");
 const crypto = require("crypto");
 
@@ -7,7 +7,8 @@ const app = express();
 const PORT = 4000;
 
 // ==== Konfigurasi, sesuai yang terdaftar di backend/src/oidc.js ====
-const IDP_ISSUER = "https://magnesium-calamity-stipend.ngrok-free.dev";
+const IDP_ISSUER =
+  process.env.IDP_ISSUER || "https://procurer-uncouth-animate.ngrok-free.dev";
 const CLIENT_ID = "client-dummy";
 const CLIENT_SECRET = "secret-dummy";
 const REDIRECT_URI = "http://localhost:4000/callback";

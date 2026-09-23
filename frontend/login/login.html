@@ -1,0 +1,94 @@
+<!-- @format -->
+
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#102a43" />
+    <title>Masuk | microdata</title>
+    <link rel="stylesheet" href="/login/login.css" />
+  </head>
+  <body>
+    <main class="login-shell">
+      <section class="brand-panel" aria-label="Informasi SSO">
+        <div class="brand-lockup">
+          <div class="brand-mark" aria-hidden="true">m</div>
+          <span class="brand-name">microdata</span>
+        </div>
+        <p class="eyebrow">MICRODATA IDENTITY CLOUD</p>
+        <h1>Data bergerak. Akses tetap terkendali.</h1>
+        <p class="brand-copy">
+          Satu pintu masuk untuk ekosistem kerja microdata yang terhubung, aman,
+          dan siap dipakai.
+        </p>
+        <div class="brand-meta">
+          <div><strong>01</strong><span>Unified access</span></div>
+          <div><strong>24/7</strong><span>Protected identity</span></div>
+        </div>
+        <div class="status-line"><span></span> Sistem autentikasi aktif</div>
+      </section>
+
+      <section class="form-panel">
+        <div class="form-intro">
+          <p class="eyebrow">MICRODATA WORKSPACE</p>
+          <h2>Masuk ke akunmu</h2>
+          <p>Selamat datang kembali. Lanjutkan ke ruang kerja kamu.</p>
+        </div>
+
+        <div class="alert" role="alert" aria-live="polite" hidden>
+          Username atau password salah.
+        </div>
+
+        <form method="post" action="__LOGIN_ACTION__" class="login-form">
+          <label for="username">Username</label>
+          <div class="input-wrap username-field">
+            <span class="input-icon" aria-hidden="true">@</span>
+            <input
+              id="username"
+              type="text"
+              name="username"
+              autocomplete="username"
+              placeholder="Masukkan username"
+              required
+              autofocus
+            />
+          </div>
+
+          <div class="password-heading">
+            <label for="password">Password</label>
+            <span class="secure-note">Terenkripsi</span>
+          </div>
+          <div class="input-wrap password-field">
+            <span class="input-icon" aria-hidden="true">*</span>
+            <input
+              id="password"
+              type="password"
+              name="password"
+              autocomplete="current-password"
+              placeholder="Masukkan password"
+              required
+            />
+            <button
+              class="password-toggle"
+              type="button"
+              aria-label="Tampilkan password"
+              aria-pressed="false"
+            >
+              Lihat
+            </button>
+          </div>
+
+          <button class="submit-button" type="submit">
+            <span class="button-label">Login</span>
+          </button>
+        </form>
+
+        <p class="footer-note">
+          Akses dilindungi oleh autentikasi terpusat perusahaan.
+        </p>
+      </section>
+    </main>
+    <script src="/login/login.js" defer></script>
+  </body>
+</html>
