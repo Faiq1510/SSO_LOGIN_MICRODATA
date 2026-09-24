@@ -1,0 +1,33 @@
+# Ignored files & directories in Docker build context
+.git
+.github
+.idea
+.vscode
+.phpunit.result.cache
+
+# Dependencies (built or mounted)
+/vendor
+/node_modules
+
+# Local Environment & Secrets
+.env
+.env.backup
+.env.production
+*.key
+
+# Laravel Logs & Storage Caches (mount instead)
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+!/storage/app/public/.gitignore
+public/storage
+/public/storage
+
+# Sub-services with their own context
+/wa-baileys-server/node_modules
+/wa-baileys-server/auth_info
+
+# Documentation / Tests
+/tests
+TODO.md

@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================
+   1. BASE STYLES & DARK THEME (Slate & Indigo Palette)
+   ========================================================= */
+
+@layer base {
+  body {
+    @apply bg-slate-950 text-slate-100 font-sans antialiased selection:bg-indigo-500 selection:text-white min-h-screen;
+  }
+
+  /* Force picker/popup tanggal & waktu bawaan browser ke mode gelap */
+  input[type="date"],
+  input[type="time"] {
+    color-scheme: dark;
+  }
+
+  /* Paksa ikon indikator kalender & jam menjadi warna putih terang */
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(1.5) !important;
+    cursor: pointer;
+  }
+}
+
+/* =========================================================
+   2. CUSTOM SCROLLBAR (Dark Mode)
+   ========================================================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #020617;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* =========================================================
+   3. PRATINJAU DOKUMEN / PDF (Dark Preview)
+   ========================================================= */
+
+@layer components {
+  .pdf-preview-card {
+    @apply bg-slate-900 border border-slate-800 rounded-2xl p-8 sm:p-12 shadow-2xl text-slate-200 transition-all;
+  }
+
+  .pdf-preview-header {
+    @apply border-b-2 border-slate-700 pb-4 mb-6 text-center;
+  }
+}
+
+/* =========================================================
+   4. KHUSUS CETAK / PRINT MODE (@media print)
+   Saat tombol print ditekan, halaman otomatis berlatar putih
+   ========================================================= */
+
+@media print {
+  /* Sembunyikan elemen navigasi, header, sidebar, dan tombol */
+  header, 
+  aside, 
+  #sidebarBackdrop, 
+  .no-print, 
+  button, 
+  a[href] {
+    display: none !important;
+  }
+
+  /* Reset layout body agar terpusat di kertas */
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  main {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  /* Ubah area kertas preview kembali menjadi putih bersih */
+  .pdf-preview-card,
+  .print-area {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Pastikan semua teks & elemen border kembali berwarna hitam pekat */
+  .pdf-preview-card *,
+  .print-area * {
+    color: #000000 !important;
+    border-color: #000000 !important;
+    background: transparent !important;
+  }
+
+  /* Memastikan logo tetap berwarna normal saat diprint */
+  img {
+    filter: none !important;
+  }
+}

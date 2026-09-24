@@ -17,8 +17,11 @@ services:
       - OIDC_JWKS=${OIDC_JWKS}
       - FRONTEND_ORIGIN=${FRONTEND_ORIGIN}
       - ISSUER=${ISSUER}
+
     volumes:
       - ./src:/app/src
+      - ../frontend:/app/public
+
     depends_on:
       db:
         condition: service_healthy

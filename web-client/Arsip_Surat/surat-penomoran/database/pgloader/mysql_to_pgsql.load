@@ -1,0 +1,15 @@
+LOAD DATABASE
+     FROM mysql://root:secret@127.0.0.1:3306/surat_penomoran
+     INTO postgresql://postgres:secret@127.0.0.1:5432/surat_penomoran
+
+WITH include drop, create tables, create indexes, reset sequences,
+     workers = 4, concurrency = 1,
+     multiple readers per thread, rows per range = 50000
+
+CAST type datetime to timestamptz
+                drop default drop not null using zero-dates-to-null,
+     type date drop not null drop default using zero-dates-to-null,
+     type tinyint to boolean using tinyint-to-boolean
+
+SET PostgreSQL WORK_MEM to '32MB',
+    PostgreSQL MAINTENANCE_WORK_MEM to '64MB';
