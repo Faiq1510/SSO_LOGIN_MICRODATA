@@ -62,7 +62,9 @@ function renderExpiredInteractionPage() {
 }
 
 function isExpiredInteractionError(err) {
-  return err?.name === "SessionNotFound" || err?.message?.includes("SessionNotFound");
+  return (
+    err?.name === "SessionNotFound" || err?.message?.includes("SessionNotFound")
+  );
 }
 
 function createInteractionRouter(oidc) {

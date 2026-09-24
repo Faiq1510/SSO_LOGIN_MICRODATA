@@ -1,3 +1,5 @@
+<!-- @format -->
+
 <!doctype html>
 <html lang="id">
   <head>
@@ -29,13 +31,22 @@
         </p>
         <div class="account-strip">
           <span class="account-dot" aria-hidden="true"></span>
-          <div><strong>Active session</strong><span>Protected by microdata</span></div>
+          <div>
+            <strong>Active session</strong><span>Protected by microdata</span>
+          </div>
         </div>
 
         __LOGOUT_FORM__
 
         <div class="logout-actions">
-          <button class="signout-button" autofocus type="submit" form="op.logoutForm" value="yes" name="logout">
+          <button
+            class="signout-button"
+            autofocus
+            type="submit"
+            form="op.logoutForm"
+            value="yes"
+            name="logout"
+          >
             Logout
           </button>
           <button class="stay-button" type="submit" form="op.logoutForm">
@@ -45,7 +56,9 @@
         <p class="privacy-note">Sesi kamu tetap aman selama proses ini.</p>
       </section>
 
-      <footer class="footer">microdata identity platform <span>&middot;</span> secure session control</footer>
+      <footer class="footer">
+        microdata identity platform <span>&middot;</span> secure session control
+      </footer>
     </main>
     <script src="/logout/logout.js" defer></script>
   </body>

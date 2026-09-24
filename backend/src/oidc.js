@@ -1,3 +1,5 @@
+/** @format */
+
 const { Provider } = require("oidc-provider");
 const fs = require("fs");
 const path = require("path");

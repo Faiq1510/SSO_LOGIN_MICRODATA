@@ -1,3 +1,5 @@
+/** @format */
+
 const logoutForm = document.querySelector("#op\.logoutForm");
 const logoutActions = document.querySelector(".logout-actions");
 const signoutButton = document.querySelector(".signout-button");
