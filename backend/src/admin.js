@@ -172,8 +172,13 @@ router.delete("/users/:id", async (req, res) => {
 
 router.post("/clients", async (req, res) => {
   try {
-    const { client_id, name, redirect_uri, post_logout_redirect_uri } =
-      req.body;
+    const {
+      client_id,
+      name,
+      redirect_uri,
+      post_logout_redirect_uri,
+      brand_color,
+    } = req.body;
     if (!client_id || !name || !redirect_uri) {
       return res
         .status(400)
@@ -182,15 +187,16 @@ router.post("/clients", async (req, res) => {
     const clientSecret =
       req.body.client_secret || crypto.randomBytes(32).toString("hex");
     const result = await pool.query(
-      `INSERT INTO clients (client_id, client_secret, redirect_uri, post_logout_redirect_uri, name)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, client_id, name, redirect_uri, post_logout_redirect_uri`,
+      `INSERT INTO clients (client_id, client_secret, redirect_uri, post_logout_redirect_uri, name, brand_color)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id, client_id, name, redirect_uri, post_logout_redirect_uri, brand_color`,
       [
         client_id,
         clientSecret,
         redirect_uri,
         post_logout_redirect_uri || null,
         name,
+        brand_color || null,
       ],
     );
     res.status(201).json({
@@ -209,7 +215,7 @@ router.post("/clients", async (req, res) => {
 router.get("/clients", async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, client_id, name, redirect_uri, post_logout_redirect_uri, created_at FROM clients ORDER BY id ASC",
+      "SELECT id, client_id, name, redirect_uri, post_logout_redirect_uri, brand_color, created_at FROM clients ORDER BY id ASC",
     );
     res.json({ clients: result.rows });
   } catch (err) {

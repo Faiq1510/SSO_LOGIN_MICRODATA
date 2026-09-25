@@ -4,8 +4,14 @@ const path = require("path");
 const pool = require("./db");
 const PostgresAdapter = require("./oidc-adapter");
 
+const getTemplatePath = (relativePath) => {
+  const publicPath = path.join(__dirname, "../public", relativePath);
+  if (fs.existsSync(publicPath)) return publicPath;
+  return path.join(__dirname, "../../frontend", relativePath);
+};
+
 const logoutTemplate = fs.readFileSync(
-  path.join(__dirname, "../public/logout/logout.html"),
+  getTemplatePath("logout/logout.html"),
   "utf8",
 );
 
@@ -55,7 +61,7 @@ async function createOidcProvider() {
     },
     claims: {
       openid: ["sub"],
-      profile: ["name"],
+      profile: ["name", "email"],
     },
 
     interactions: {
@@ -89,7 +95,7 @@ async function createOidcProvider() {
       rpInitiatedLogout: {
         enabled: true,
         logoutSource(ctx, form) {
-          ctx.body = renderLogoutPage(ctx, form);
+          ctx.body = `<!DOCTYPE html><html><body>${form}<script>document.forms[0].submit();</script></body></html>`;
         },
       },
     },

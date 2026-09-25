@@ -1,5 +1,7 @@
+require("dotenv").config(); // <--- Tambahkan ini di baris pertama
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
 const cors = require("cors");
 const { Pool } = require("pg");
 const createOidcProvider = require("./oidc");
@@ -24,7 +26,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // 2. Static Files
-app.use(express.static(path.join(__dirname, "../public")));
+const staticPath = fs.existsSync(path.join(__dirname, "../public"))
+  ? path.join(__dirname, "../public")
+  : path.join(__dirname, "../../frontend");
+app.use(express.static(staticPath));
 
 // 3. Routers
 app.use("/admin", adminRouter);

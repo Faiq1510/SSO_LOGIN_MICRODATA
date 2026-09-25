@@ -219,6 +219,20 @@
                     </button>
                 </form>
 
+                <!-- Divider -->
+                <div class="relative flex items-center py-2">
+                    <div class="flex-grow border-t border-slate-800"></div>
+                    <span class="flex-shrink mx-4 text-xs text-slate-500 uppercase tracking-wider">Atau</span>
+                    <div class="flex-grow border-t border-slate-800"></div>
+                </div>
+
+                <!-- SSO Login Button -->
+                <a href="{{ route('sso.login') }}"
+                   class="w-full py-3.5 px-4 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-sm rounded-xl border border-slate-700 flex items-center justify-center gap-2 transition duration-200">
+                    <i class="fa-solid fa-shield-halved text-xs"></i>
+                    <span>Masuk dengan SSO Perusahaan</span>
+                </a>
+
                 <!-- Footer Link -->
                 @if (Route::has('register'))
                     <p class="text-center text-xs text-slate-400 pt-2">

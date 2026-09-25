@@ -6,22 +6,51 @@ const fs = require("fs");
 const path = require("path");
 const pool = require("./db");
 
+const DEFAULT_ACCENT = "#ee6c4d";
+const DEFAULT_ACCENT_DARK = "#d65338";
+
+const getTemplatePath = (relativePath) => {
+  const publicPath = path.join(__dirname, "../public", relativePath);
+  if (fs.existsSync(publicPath)) return publicPath;
+  return path.join(__dirname, "../../frontend", relativePath);
+};
+
 const loginTemplate = fs.readFileSync(
-  path.join(__dirname, "../public/login/login.html"),
+  getTemplatePath("login/login.html"),
   "utf8",
 );
 const consentTemplate = fs.readFileSync(
-  path.join(__dirname, "../public/consent/consent.html"),
+  getTemplatePath("consent/consent.html"),
   "utf8",
 );
 
-function renderLoginPage(uid, showError = false) {
+function darkenHex(hex, percent = 0.1) {
+  const num = parseInt(hex.replace("#", ""), 16);
+  let r = (num >> 16) - Math.round(255 * percent);
+  let g = ((num >> 8) & 0x00ff) - Math.round(255 * percent);
+  let b = (num & 0x0000ff) - Math.round(255 * percent);
+  r = Math.max(0, r);
+  g = Math.max(0, g);
+  b = Math.max(0, b);
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
+}
+
+async function renderLoginPage(uid, clientId, showError = false) {
+  const result = await pool.query(
+    "SELECT brand_color FROM clients WHERE client_id = $1",
+    [clientId],
+  );
+  const accent = result.rows[0]?.brand_color || DEFAULT_ACCENT;
+  const accentDark = darkenHex(accent);
+
   return loginTemplate
     .replace("__LOGIN_ACTION__", `/oidc/interaction/${uid}/login`)
     .replace(
       '<div class="alert" role="alert" aria-live="polite" hidden>',
       `<div class="alert" role="alert" aria-live="polite"${showError ? "" : " hidden"}>`,
-    );
+    )
+    .replace("__ACCENT__", accent)
+    .replace("__ACCENT_DARK__", accentDark);
 }
 
 function renderConsentPage(uid) {
@@ -62,7 +91,9 @@ function renderExpiredInteractionPage() {
 }
 
 function isExpiredInteractionError(err) {
-  return err?.name === "SessionNotFound" || err?.message?.includes("SessionNotFound");
+  return (
+    err?.name === "SessionNotFound" || err?.message?.includes("SessionNotFound")
+  );
 }
 
 function createInteractionRouter(oidc) {
@@ -70,10 +101,10 @@ function createInteractionRouter(oidc) {
 
   router.get("/interaction/:uid", async (req, res, next) => {
     try {
-      const { uid, prompt } = await oidc.interactionDetails(req, res);
+      const { uid, prompt, params } = await oidc.interactionDetails(req, res);
 
       if (prompt.name === "login") {
-        res.send(renderLoginPage(uid));
+        res.send(await renderLoginPage(uid, params.client_id));
         return;
       }
 
@@ -98,6 +129,7 @@ function createInteractionRouter(oidc) {
       try {
         const { username, password } = req.body;
         const { uid } = req.params;
+        const { params } = await oidc.interactionDetails(req, res);
 
         const result = await pool.query(
           "SELECT id, password_hash FROM users WHERE username = $1",
@@ -110,7 +142,7 @@ function createInteractionRouter(oidc) {
           : await bcrypt.compare(password, "$2b$10$invalidsaltinvalidsaltin");
 
         if (!user || !passwordMatches) {
-          return res.send(renderLoginPage(uid, true));
+          return res.send(await renderLoginPage(uid, params.client_id, true));
         }
 
         const loginResult = {

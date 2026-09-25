@@ -42,4 +42,12 @@ return [
     'wa_server' => [
         'url' => env('WA_SERVER_URL', 'http://localhost:3000'),
     ],
+    
+    'sso' => [
+    'issuer' => env('SSO_ISSUER'),
+    'client_id' => env('SSO_CLIENT_ID'),
+    'client_secret' => env('SSO_CLIENT_SECRET'),
+    'redirect_uri' => env('SSO_REDIRECT_URI'),
+    'post_logout_redirect_uri' => env('APP_URL') . '/login',
+],
 ];

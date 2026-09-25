@@ -526,10 +526,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const ctx = canvas.getContext('2d');
 
-    const chartLabels     = {{ Illuminate\Support\Js::from($chartLabels ?? ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun']) }};
-    const dataSuratMasuk  = {{ Illuminate\Support\Js::from($dataSuratMasuk ?? [0, 0, 0, 0, 0, 0]) }};
-    const dataSuratKeluar = {{ Illuminate\Support\Js::from($dataSuratKeluar ?? [0, 0, 0, 0, 0, 0]) }};
-    const dataArsip       = {{ Illuminate\Support\Js::from($dataArsip ?? [0, 0, 0, 0, 0, 0]) }};
+    const chartLabels = {!! json_encode($chartLabels ?? ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun']) !!};
+    const dataSuratMasuk = {!! json_encode($dataSuratMasuk ?? [0, 0, 0, 0, 0, 0]) !!};
+    const dataSuratKeluar = {!! json_encode($dataSuratKeluar ?? [0, 0, 0, 0, 0, 0]) !!};
+    const dataArsip = {!! json_encode($dataArsip ?? [0, 0, 0, 0, 0, 0]) !!};
 
     new Chart(ctx, {
         type: 'bar',

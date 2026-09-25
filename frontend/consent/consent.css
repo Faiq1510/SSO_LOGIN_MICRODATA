@@ -49,7 +49,8 @@ body::before {
   animation: rise-in 600ms ease both;
 }
 
-.brand-lockup { display: flex; align-items: center; gap: 10px; }
+.brand-lockup { display: flex; align-items: center; }
+.brand-logo-img { height: 44px; width: auto; object-fit: contain; }
 .brand-mark {
   display: grid;
   place-items: center;

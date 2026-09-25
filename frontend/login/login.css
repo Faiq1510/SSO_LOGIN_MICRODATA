@@ -58,8 +58,8 @@ body::before {
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: clamp(36px, 7vw, 84px);
+  justify-content: flex-start;
+  padding: 44px 48px;
   overflow: hidden;
   color: #fffaf0;
   background: #102a43;
@@ -83,29 +83,16 @@ body::before {
 .brand-lockup {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 88px;
+  margin-bottom: 48px;
+  margin-left: -4px;
 }
 
-.brand-mark {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  color: #102a43;
-  background: var(--lime);
-  border-radius: 15px 4px 15px 4px;
-  font-family: Georgia, serif;
-  font-size: 31px;
-  font-weight: 700;
-  transform: rotate(-6deg);
-}
-
-.brand-name {
-  color: #f7fbf5;
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.05em;
+.brand-logo-img {
+  height: 72px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  filter: brightness(112%) contrast(115%);
 }
 
 .eyebrow {
