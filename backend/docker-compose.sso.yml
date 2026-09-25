@@ -1,0 +1,10 @@
+# @format
+
+services:
+  app:
+    ports: !override
+      - "3001:3000"
+
+  db:
+    ports: !override
+      - "5433:5432"

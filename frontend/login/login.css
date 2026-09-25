@@ -246,18 +246,24 @@ label,
 .input-wrap input::placeholder {
   color: #91a1aa;
 }
-.username-field input { border-color: rgba(31, 122, 120, 0.45); }
-.password-field input { border-color: rgba(238, 108, 77, 0.45); }
+.username-field input {
+  border-color: rgba(31, 122, 120, 0.45);
+}
+.password-field input {
+  border-color: rgba(238, 108, 77, 0.45);
+}
 .username-field:focus-within input {
   background: #fff;
   border-color: var(--teal);
-  box-shadow: 0 8px 20px rgba(31, 122, 120, 0.1),
+  box-shadow:
+    0 8px 20px rgba(31, 122, 120, 0.1),
     0 0 0 4px rgba(31, 122, 120, 0.1);
 }
 .password-field:focus-within input {
   background: #fff;
   border-color: var(--accent);
-  box-shadow: 0 8px 20px rgba(238, 108, 77, 0.1),
+  box-shadow:
+    0 8px 20px rgba(238, 108, 77, 0.1),
     0 0 0 4px rgba(238, 108, 77, 0.1);
 }
 .input-icon {

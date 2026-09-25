@@ -1,3 +1,5 @@
+/** @format */
+
 const consentForm = document.querySelector(".consent-form");
 const approveButton = document.querySelector(".approve-button");
 
