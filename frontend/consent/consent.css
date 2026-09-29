@@ -50,20 +50,19 @@ body::before {
 .topbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   animation: rise-in 600ms ease both;
 }
 
-<<<<<<< HEAD
-.brand-lockup { display: flex; align-items: center; }
-.brand-logo-img { height: 44px; width: auto; object-fit: contain; }
-=======
 .brand-lockup {
   display: flex;
   align-items: center;
-  gap: 10px;
 }
->>>>>>> 73f9a00b93e4611d44e83d7e8efbbf2a73f2f272
+.brand-logo-img {
+  height: 44px;
+  width: auto;
+  object-fit: contain;
+}
 .brand-mark {
   display: grid;
   place-items: center;
@@ -124,24 +123,25 @@ body::before {
 .icon-orbit {
   display: grid;
   place-items: center;
-  width: 76px;
-  height: 76px;
+  width: 204px;
+  height: 112px;
   margin: 0 auto 28px;
-  border: 1px dashed rgba(31, 122, 120, 0.45);
-  border-radius: 50%;
   animation: orbit-in 700ms 300ms both;
+}
+.consent-logo {
+  display: block;
+  width: 182px;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
 }
 .app-icon {
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
-  color: #f7fbf5;
+  width: 100%;
+  height: 100%;
   background: var(--ink);
-  border-radius: 14px 4px 14px 4px;
-  font-family: Georgia, serif;
-  font-size: 24px;
-  font-weight: 700;
+  border-radius: 12px;
 }
 .eyebrow {
   margin: 0 0 14px;

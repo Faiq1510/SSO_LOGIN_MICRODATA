@@ -44,11 +44,6 @@ body::before {
   margin: auto;
   padding: 28px 0 24px;
 }
-<<<<<<< HEAD
-.topbar { display: flex; align-items: center; justify-content: space-between; animation: rise-in 600ms ease both; }
-.brand-lockup { display: flex; align-items: center; }
-.brand-logo-img { height: 44px; width: auto; object-fit: contain; }
-=======
 .topbar {
   display: flex;
   align-items: center;
@@ -58,9 +53,12 @@ body::before {
 .brand-lockup {
   display: flex;
   align-items: center;
-  gap: 10px;
 }
->>>>>>> 73f9a00b93e4611d44e83d7e8efbbf2a73f2f272
+.brand-logo-img {
+  height: 44px;
+  width: auto;
+  object-fit: contain;
+}
 .brand-mark {
   display: grid;
   place-items: center;

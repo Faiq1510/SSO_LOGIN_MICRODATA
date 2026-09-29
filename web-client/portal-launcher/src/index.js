@@ -13,8 +13,10 @@ const PORT = process.env.PORT || 9000;
 const IDP_ISSUER = process.env.IDP_ISSUER || "http://localhost:3000";
 const CLIENT_ID = process.env.CLIENT_ID || "portal-launcher";
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
-const REDIRECT_URI = process.env.REDIRECT_URI || "http://localhost:9000/callback";
-const POST_LOGOUT_REDIRECT_URI = process.env.POST_LOGOUT_REDIRECT_URI || "http://localhost:9000/";
+const REDIRECT_URI =
+  process.env.REDIRECT_URI || "http://localhost:9000/callback";
+const POST_LOGOUT_REDIRECT_URI =
+  process.env.POST_LOGOUT_REDIRECT_URI || "http://localhost:9000/";
 
 // DB Pool untuk membaca daftar aplikasi dari tabel clients
 const pool = new Pool({
@@ -27,7 +29,7 @@ const pool = new Pool({
 
 // In-memory store
 const pendingRequests = new Map(); // state → { codeVerifier }
-const sessions = new Map();        // sessionId → { id_token, user }
+const sessions = new Map(); // sessionId → { id_token, user }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -43,9 +45,7 @@ function getCookie(req, name) {
 
 function decodeJwt(token) {
   try {
-    return JSON.parse(
-      Buffer.from(token.split(".")[1], "base64url").toString()
-    );
+    return JSON.parse(Buffer.from(token.split(".")[1], "base64url").toString());
   } catch {
     return {};
   }
@@ -75,7 +75,11 @@ function buildGradient(color) {
 // ─── Static: logo microdata ────────────────────────────────────────────────────
 
 // Salin logo dari frontend/images jika belum ada
-const logoSrc = path.join(__dirname, "../../..", "frontend/images/microdata-logo.webp");
+const logoSrc = path.join(
+  __dirname,
+  "../../..",
+  "frontend/images/microdata-logo.webp",
+);
 const logoPublicDir = path.join(__dirname, "../public/images");
 const logoDest = path.join(logoPublicDir, "microdata-logo.webp");
 
@@ -96,7 +100,7 @@ app.get("/", requireAuth, async (req, res) => {
       `SELECT client_id, name, client_name, brand_color, app_url
        FROM clients
        WHERE app_url IS NOT NULL AND app_url <> ''
-       ORDER BY id ASC`
+       ORDER BY id ASC`,
     );
     apps = result.rows;
   } catch (err) {
@@ -433,6 +437,7 @@ app.get("/", requireAuth, async (req, res) => {
 
 // GET /login — Inisiasi OIDC flow
 app.get("/login", (req, res) => {
+  const forceLogin = getCookie(req, "portal_force_login") === "1";
   const codeVerifier = crypto.randomBytes(32).toString("base64url");
   const codeChallenge = crypto
     .createHash("sha256")
@@ -453,6 +458,13 @@ app.get("/login", (req, res) => {
     `&code_challenge_method=S256` +
     `&prompt=login`;
 
+  if (forceLogin) {
+    res.setHeader(
+      "Set-Cookie",
+      "portal_force_login=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Path=/; SameSite=Lax",
+    );
+  }
+
   res.redirect(authUrl);
 });
 
@@ -468,12 +480,18 @@ app.get("/callback", async (req, res) => {
 
   const codeVerifier = pendingRequests.get(state);
   if (!codeVerifier) {
-    return res.status(400).send("<p>State tidak dikenali atau sudah kedaluwarsa. Silakan coba lagi.</p>");
+    return res
+      .status(400)
+      .send(
+        "<p>State tidak dikenali atau sudah kedaluwarsa. Silakan coba lagi.</p>",
+      );
   }
   pendingRequests.delete(state);
 
   try {
-    const basicAuth = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString("base64");
+    const basicAuth = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString(
+      "base64",
+    );
 
     const tokenResponse = await fetch(`${IDP_ISSUER}/oidc/token`, {
       method: "POST",
@@ -492,7 +510,9 @@ app.get("/callback", async (req, res) => {
     const tokenData = await tokenResponse.json();
 
     if (!tokenResponse.ok) {
-      return res.status(400).send(`<pre>${JSON.stringify(tokenData, null, 2)}</pre>`);
+      return res
+        .status(400)
+        .send(`<pre>${JSON.stringify(tokenData, null, 2)}</pre>`);
     }
 
     const payload = decodeJwt(tokenData.id_token);
@@ -522,14 +542,18 @@ app.post("/logout", (req, res) => {
   const idToken = session?.id_token;
 
   if (sid) sessions.delete(sid);
-  res.setHeader("Set-Cookie", "portal_sid=; Max-Age=0; Path=/");
+  res.setHeader("Set-Cookie", [
+    "portal_sid=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Path=/; SameSite=Lax",
+    "portal_force_login=1; Max-Age=300; HttpOnly; Path=/; SameSite=Lax",
+  ]);
 
-  if (!idToken) return res.redirect("/");
+  const logoutParams = new URLSearchParams({
+    client_id: CLIENT_ID,
+    post_logout_redirect_uri: POST_LOGOUT_REDIRECT_URI,
+  });
+  if (idToken) logoutParams.set("id_token_hint", idToken);
 
-  const logoutUrl =
-    `${IDP_ISSUER}/oidc/session/end?` +
-    `id_token_hint=${idToken}` +
-    `&post_logout_redirect_uri=${encodeURIComponent(POST_LOGOUT_REDIRECT_URI)}`;
+  const logoutUrl = `${IDP_ISSUER}/oidc/session/end?${logoutParams}`;
 
   res.redirect(logoutUrl);
 });

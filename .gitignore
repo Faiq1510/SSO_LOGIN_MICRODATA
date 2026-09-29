@@ -1,5 +1,29 @@
 node_modules/
 **/node_modules/
 .env
+.env.local
+.env.*.local
+!.env.example
+!.env.docker.example
 *.log
+*.pid
 .DS_Store
+
+# Generated frontend and test output
+.next/
+**/.next/
+dist/
+**/dist/
+build/
+**/build/
+coverage/
+**/coverage/
+
+# Local framework/runtime state
+web-client/cpc/vendor/
+web-client/surat-penomoran/vendor/
+
+# Local tunnel binaries and backups
+*.old
+*.bak
+*.backup
