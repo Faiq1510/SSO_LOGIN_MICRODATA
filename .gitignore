@@ -27,8 +27,3 @@ web-client/surat-penomoran/vendor/
 *.old
 *.bak
 *.backup
-
-# External application repositories managed by their own teams
-/web-client/cpc/
-/web-client/microintern/
-/web-client/saims/
