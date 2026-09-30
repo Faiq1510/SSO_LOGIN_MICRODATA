@@ -56,7 +56,9 @@ function SSOCallbackContent() {
             Cookies.set('saims_user', JSON.stringify(data.user), { expires: 1 });
             if (data.token) {
               localStorage.setItem('saims_token', data.token);
+              localStorage.setItem('access_token', data.token);
               Cookies.set('saims_token', data.token, { expires: 1 });
+              Cookies.set('access_token', data.token, { expires: 1 });
             }
 
             // 3. Masuk ke Dashboard SAIMS

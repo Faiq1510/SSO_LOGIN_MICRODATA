@@ -52,14 +52,17 @@ async function createOidcProvider() {
     response_types: ["code"],
   }));
 
-  const oidc = new Provider(process.env.ISSUER || "http://localhost:3000", {
+  const issuer = process.env.ISSUER || "http://localhost:3000";
+  const isSecure = issuer.startsWith("https");
+
+  const oidc = new Provider(issuer, {
     clients,
     adapter: PostgresAdapter,
     jwks: JSON.parse(process.env.OIDC_JWKS),
     cookies: {
       keys: [process.env.COOKIES_KEY],
-      long: { signed: true, sameSite: "none", secure: true },
-      short: { signed: true, sameSite: "none", secure: true },
+      long: { signed: true, sameSite: isSecure ? "none" : "lax", secure: isSecure },
+      short: { signed: true, sameSite: isSecure ? "none" : "lax", secure: isSecure },
     },
     claims: {
       openid: ["sub"],

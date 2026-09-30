@@ -26,7 +26,8 @@ function generateRandomString(length: number = 32): string {
 }
 
 export async function redirectToSSO() {
-  const ISSUER = "https://procurer-uncouth-animate.ngrok-free.dev"; // Atau http://localhost:3000
+  const ISSUER =
+    process.env.NEXT_PUBLIC_SSO_ISSUER || "http://localhost:3000";
   const CLIENT_ID = "client-saims";
   const REDIRECT_URI = "http://localhost:3002/sso/callback";
 

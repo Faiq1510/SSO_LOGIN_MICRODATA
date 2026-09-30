@@ -47,7 +47,8 @@ export async function POST(request: NextRequest) {
 
     const ISSUER =
       process.env.SSO_ISSUER ||
-      "https://procurer-uncouth-animate.ngrok-free.dev";
+      process.env.NEXT_PUBLIC_SSO_ISSUER ||
+      "http://localhost:3000";
     const CLIENT_ID = "client-saims";
     const CLIENT_SECRET =
       process.env.SSO_SHARED_SECRET ||
