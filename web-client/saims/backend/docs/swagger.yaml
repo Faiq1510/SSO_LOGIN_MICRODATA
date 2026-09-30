@@ -1,0 +1,1453 @@
+basePath: /api
+definitions:
+  domain.AuthResponse:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/domain.User'
+    type: object
+  domain.BulkAssetItem:
+    properties:
+      condition:
+        type: string
+      serial_number:
+        type: string
+      status:
+        type: string
+    required:
+    - condition
+    type: object
+  domain.ChangePasswordRequest:
+    properties:
+      current_password:
+        type: string
+      new_password:
+        minLength: 8
+        type: string
+    required:
+    - current_password
+    - new_password
+    type: object
+  domain.CreateAssetInput:
+    properties:
+      category:
+        type: string
+      condition:
+        type: string
+      description:
+        type: string
+      location:
+        type: string
+      name:
+        type: string
+      purchase_date:
+        type: string
+      serial_number:
+        type: string
+      status:
+        type: string
+    required:
+    - category
+    - condition
+    - location
+    - name
+    - status
+    type: object
+  domain.CreateBorrowingInput:
+    properties:
+      asset_ids:
+        items:
+          type: string
+        minItems: 1
+        type: array
+      end_date:
+        type: string
+      purpose:
+        type: string
+      start_date:
+        type: string
+    required:
+    - asset_ids
+    - end_date
+    - purpose
+    - start_date
+    type: object
+  domain.CreateBulkAssetsInput:
+    properties:
+      category:
+        type: string
+      description:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/domain.BulkAssetItem'
+        minItems: 1
+        type: array
+      location:
+        type: string
+      name:
+        type: string
+      purchase_date:
+        type: string
+    required:
+    - category
+    - items
+    - location
+    - name
+    type: object
+  domain.CreateMaintenanceInput:
+    properties:
+      asset_id:
+        description: For backward compatibility
+        type: string
+      asset_ids:
+        description: For bulk insertion
+        items:
+          type: string
+        type: array
+      estimated_cost:
+        type: number
+      notes:
+        type: string
+      scheduled_date:
+        type: string
+      technician_id:
+        type: string
+      technician_name:
+        type: string
+      type:
+        type: string
+    required:
+    - scheduled_date
+    - type
+    type: object
+  domain.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  domain.RegisterRequest:
+    properties:
+      department:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        minLength: 8
+        type: string
+      phone:
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - phone
+    type: object
+  domain.ResendOTPRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  domain.UpdateAssetInput:
+    properties:
+      category:
+        type: string
+      condition:
+        type: string
+      description:
+        type: string
+      location:
+        type: string
+      name:
+        type: string
+      purchase_date:
+        type: string
+      serial_number:
+        type: string
+      status:
+        type: string
+    type: object
+  domain.UpdateBorrowingStatusInput:
+    properties:
+      asset_condition:
+        type: string
+      rejection_reason:
+        type: string
+      status:
+        type: string
+    required:
+    - status
+    type: object
+  domain.UpdateMaintenanceDetailsInput:
+    properties:
+      estimated_cost:
+        type: number
+      notes:
+        type: string
+      scheduled_date:
+        type: string
+      type:
+        type: string
+    required:
+    - scheduled_date
+    - type
+    type: object
+  domain.UpdateMaintenanceStatusInput:
+    properties:
+      actual_cost:
+        type: number
+      asset_condition:
+        type: string
+      completed_date:
+        type: string
+      notes:
+        type: string
+      status:
+        type: string
+    required:
+    - status
+    type: object
+  domain.UpdateProfileRequest:
+    properties:
+      department:
+        type: string
+      id_karyawan:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+    required:
+    - phone
+    type: object
+  domain.UpdateRoleRequest:
+    properties:
+      role:
+        type: string
+    required:
+    - role
+    type: object
+  domain.User:
+    properties:
+      created_at:
+        type: string
+      department:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      id_karyawan:
+        type: string
+      is_verified:
+        type: boolean
+      last_login:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      role:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  domain.VerifyOTPRequest:
+    properties:
+      email:
+        type: string
+      otp_code:
+        type: string
+    required:
+    - email
+    - otp_code
+    type: object
+  domain.VerifyPhoneRequest:
+    properties:
+      otp_code:
+        type: string
+      phone:
+        type: string
+    required:
+    - otp_code
+    - phone
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Smart Asset & Inventory Management System API
+  title: SAIMS API
+  version: "1.0"
+paths:
+  /assets:
+    get:
+      description: Get a paginated list of assets with optional filters
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Limit per page
+        in: query
+        name: limit
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      - description: Category
+        in: query
+        name: category
+        type: string
+      - description: Status
+        in: query
+        name: status
+        type: string
+      - description: Condition
+        in: query
+        name: condition
+        type: string
+      - description: Location
+        in: query
+        name: location
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get list of assets
+      tags:
+      - Assets
+    post:
+      consumes:
+      - application/json
+      description: Create a new asset with details
+      parameters:
+      - description: Asset Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateAssetInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new asset
+      tags:
+      - Assets
+  /assets/{id}:
+    delete:
+      description: Delete an existing asset
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete an asset
+      tags:
+      - Assets
+    get:
+      description: Get details of a specific asset
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get asset by ID
+      tags:
+      - Assets
+    put:
+      consumes:
+      - application/json
+      description: Update details of an existing asset
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Asset Update Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdateAssetInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update an asset
+      tags:
+      - Assets
+  /assets/{id}/images:
+    get:
+      description: Get all images for a specific asset
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get images by asset ID
+      tags:
+      - Asset Images
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload an image for a specific asset
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Image File
+        in: formData
+        name: image
+        required: true
+        type: file
+      - description: Set as primary image
+        in: formData
+        name: is_primary
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Upload asset image
+      tags:
+      - Asset Images
+  /assets/{id}/images/{imageId}:
+    delete:
+      description: Delete a specific asset image
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Image ID
+        in: path
+        name: imageId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete asset image
+      tags:
+      - Asset Images
+  /assets/{id}/images/{imageId}/primary:
+    put:
+      description: Set a specific image as the primary image for an asset
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Image ID
+        in: path
+        name: imageId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Set primary image
+      tags:
+      - Asset Images
+  /assets/bulk:
+    post:
+      consumes:
+      - application/json
+      description: Create multiple assets in bulk
+      parameters:
+      - description: Bulk Assets Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateBulkAssetsInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create multiple assets
+      tags:
+      - Assets
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: 'Authenticate user. Catatan: API masuk tidak lagi mengembalikan
+        Token di dalam tubuh JSON, melainkan berevolusi menjadi Set-Cookie HttpOnly.'
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login user
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      description: Blacklist active JWT token and clear auth cookies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Logout user
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user and get user details
+      parameters:
+      - description: Registration data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register a new user
+      tags:
+      - Auth
+  /auth/resend-otp:
+    post:
+      consumes:
+      - application/json
+      description: Resend OTP to user's WhatsApp
+      parameters:
+      - description: Email credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ResendOTPRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Resend OTP
+      tags:
+      - Auth
+  /auth/verify-otp:
+    post:
+      consumes:
+      - application/json
+      description: Verify OTP and return JWT token
+      parameters:
+      - description: OTP credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.VerifyOTPRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Verify OTP
+      tags:
+      - Auth
+  /borrowings:
+    get:
+      description: Get list of borrowing requests
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Limit per page
+        in: query
+        name: limit
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      - description: Status filter
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get borrowing requests
+      tags:
+      - Borrowings
+    post:
+      consumes:
+      - application/json
+      description: Create a new borrowing request
+      parameters:
+      - description: Borrowing Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateBorrowingInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create borrowing request
+      tags:
+      - Borrowings
+  /borrowings/{id}:
+    delete:
+      description: Delete a borrowing request
+      parameters:
+      - description: Borrowing ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete borrowing request
+      tags:
+      - Borrowings
+  /borrowings/{id}/status:
+    put:
+      consumes:
+      - application/json
+      description: Update the status of a borrowing request
+      parameters:
+      - description: Borrowing ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Status Update Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdateBorrowingStatusInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update borrowing status
+      tags:
+      - Borrowings
+  /dashboard/stats:
+    get:
+      description: Get overall statistics for the dashboard
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get dashboard stats
+      tags:
+      - Dashboard
+  /health:
+    get:
+      description: Check API health status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Health Check
+      tags:
+      - Public
+  /maintenance:
+    get:
+      description: Get a paginated list of maintenance records
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Limit per page
+        in: query
+        name: limit
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      - description: Status filter
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get maintenance records
+      tags:
+      - Maintenances
+    post:
+      consumes:
+      - application/json
+      description: Create a new maintenance record
+      parameters:
+      - description: Maintenance Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateMaintenanceInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create maintenance record
+      tags:
+      - Maintenances
+  /maintenance/{id}/details:
+    put:
+      consumes:
+      - application/json
+      description: Update the specific details of a maintenance record
+      parameters:
+      - description: Maintenance ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Details Update Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdateMaintenanceDetailsInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update maintenance details
+      tags:
+      - Maintenances
+  /maintenance/{id}/status:
+    put:
+      consumes:
+      - application/json
+      description: Update the status of a maintenance record
+      parameters:
+      - description: Maintenance ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Status Update Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdateMaintenanceStatusInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update maintenance status
+      tags:
+      - Maintenances
+  /maintenance/payment/confirm:
+    post:
+      consumes:
+      - application/json
+      description: Confirm payment for multiple maintenance records (Administrator
+        only) and generate PDF invoice
+      parameters:
+      - description: 'Bulk Payment Input: maintenance_ids array'
+        in: body
+        name: input
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Confirm bulk payment for maintenance
+      tags:
+      - Maintenances
+  /notifications:
+    get:
+      description: Get notifications for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user notifications
+      tags:
+      - Notifications
+  /notifications/{id}/read:
+    put:
+      description: Mark a specific notification as read
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Mark notification as read
+      tags:
+      - Notifications
+  /notifications/read-all:
+    put:
+      description: Mark all notifications for the user as read
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Mark all notifications as read
+      tags:
+      - Notifications
+  /public/landing-stats:
+    get:
+      description: Get statistics for the landing page
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get landing stats
+      tags:
+      - Dashboard
+  /users:
+    get:
+      description: Get a list of all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all users
+      tags:
+      - Users
+  /users/{id}:
+    delete:
+      description: Delete an existing user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete user
+      tags:
+      - Users
+    get:
+      description: Get details of a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user by ID
+      tags:
+      - Users
+  /users/{id}/role:
+    put:
+      consumes:
+      - application/json
+      description: Update the role of a user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Role Update Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdateRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update user role
+      tags:
+      - Users
+  /users/change-password:
+    put:
+      consumes:
+      - application/json
+      description: Change password of the authenticated user
+      parameters:
+      - description: Password Update Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Change user password
+      tags:
+      - Users
+  /users/profile:
+    put:
+      consumes:
+      - application/json
+      description: Update profile of the authenticated user
+      parameters:
+      - description: Profile Update Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdateProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update user profile
+      tags:
+      - Users
+  /users/profile/verify-phone:
+    post:
+      consumes:
+      - application/json
+      description: Verify phone number update with OTP
+      parameters:
+      - description: OTP Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.VerifyPhoneRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Verify phone with OTP
+      tags:
+      - Users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

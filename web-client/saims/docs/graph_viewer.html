@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAIMS Knowledge Graph Visualizer</title>
+  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0B0F17;
+      color: #F3F4F6;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      overflow: hidden;
+    }
+    #mynetwork {
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at 50% 50%, #111827 0%, #0B0F17 100%);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Glassmorphic Navigation Bar -->
+  <div class="fixed top-4 left-4 right-4 z-50 flex flex-wrap items-center justify-between gap-4 p-4 bg-gray-900/80 backdrop-blur-xl border border-gray-800 rounded-2xl shadow-2xl">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-orange-500 to-blue-600 flex items-center justify-center font-bold text-white shadow-lg">
+        SG
+      </div>
+      <div>
+        <h1 class="text-base font-bold text-white tracking-tight">SAIMS Knowledge Graph Visualizer</h1>
+        <p class="text-xs text-gray-400">Memory Graph Index • 1,813 Nodes • 4,948 Edges</p>
+      </div>
+    </div>
+
+    <!-- Live Search & Controls -->
+    <div class="flex items-center gap-3">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Cari Node (misal: Asset, Borrowing)..."
+        class="px-4 py-2 bg-gray-800/90 border border-gray-700 rounded-xl text-xs text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 w-64 transition-all"
+        onkeyup="filterNodes()"
+      />
+      <button
+        onclick="resetZoom()"
+        class="px-3 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-xs font-semibold text-gray-200 rounded-xl transition-all"
+      >
+        Reset Zoom
+      </button>
+      <button
+        onclick="togglePhysics()"
+        id="physicsBtn"
+        class="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white rounded-xl transition-all"
+      >
+        Physics: ON
+      </button>
+    </div>
+  </div>
+
+  <!-- Legend Overlay -->
+  <div class="fixed bottom-4 left-4 z-50 p-4 bg-gray-900/80 backdrop-blur-xl border border-gray-800 rounded-2xl shadow-2xl text-xs space-y-2 max-w-xs">
+    <div class="font-bold text-gray-300 uppercase text-[10px] tracking-wider mb-1">Legenda Kategori Node</div>
+    <div class="grid grid-cols-2 gap-2">
+      <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-500"></span><span class="text-gray-300">Route / Endpoint</span></div>
+      <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500"></span><span class="text-gray-300">Handler / Class</span></div>
+      <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-cyan-400"></span><span class="text-gray-300">Service / Logic</span></div>
+      <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-purple-500"></span><span class="text-gray-300">Repo / Model</span></div>
+      <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-orange-500"></span><span class="text-gray-300">React Component</span></div>
+      <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-amber-400"></span><span class="text-gray-300">Module / File</span></div>
+    </div>
+  </div>
+
+  <!-- Node Inspector Modal (Hidden by Default) -->
+  <div id="inspector" class="fixed bottom-4 right-4 z-50 p-5 bg-gray-900/90 backdrop-blur-xl border border-gray-800 rounded-2xl shadow-2xl text-xs max-w-sm hidden">
+    <div class="flex items-center justify-between mb-2">
+      <span id="inspectorType" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-500/20 text-blue-400">TYPE</span>
+      <button onclick="closeInspector()" class="text-gray-400 hover:text-white">✕</button>
+    </div>
+    <h3 id="inspectorTitle" class="text-sm font-bold text-white mb-1">Node Title</h3>
+    <p id="inspectorDetail" class="text-xs text-gray-400 leading-relaxed">Detail node relasi</p>
+  </div>
+
+  <!-- Main Canvas Container -->
+  <div id="mynetwork"></div>
+
+  <script>
+    // Raw Graph Data Extracted from codebase-memory-mcp
+    const rawNodes = [
+      { id: 'AssetHandler', label: 'AssetHandler', group: 'Handler', title: 'Class: AssetHandler (Internal Backend)' },
+      { id: 'AssetService', label: 'AssetService', group: 'Service', title: 'Interface: AssetService' },
+      { id: 'AssetRepository', label: 'AssetRepository', group: 'Repository', title: 'Interface: AssetRepository' },
+      { id: 'CreateAsset', label: 'CreateAsset', group: 'Function', title: 'Method: CreateAsset' },
+      { id: 'GetAssets', label: 'GetAssets', group: 'Function', title: 'Method: GetAssets' },
+      { id: 'UpdateAsset', label: 'UpdateAsset', group: 'Function', title: 'Method: UpdateAsset' },
+      { id: 'DeleteAsset', label: 'DeleteAsset', group: 'Function', title: 'Method: DeleteAsset' },
+      
+      { id: 'BorrowingHandler', label: 'BorrowingHandler', group: 'Handler', title: 'Class: BorrowingHandler' },
+      { id: 'BorrowingService', label: 'BorrowingService', group: 'Service', title: 'Interface: BorrowingService' },
+      { id: 'BorrowingRepository', label: 'BorrowingRepository', group: 'Repository', title: 'Interface: BorrowingRepository' },
+      { id: 'CreateBorrowing', label: 'CreateBorrowing', group: 'Function', title: 'Method: CreateBorrowing' },
+      { id: 'GetBorrowings', label: 'GetBorrowings', group: 'Function', title: 'Method: GetBorrowings' },
+      { id: 'UpdateBorrowingStatus', label: 'UpdateBorrowingStatus', group: 'Function', title: 'Method: UpdateBorrowingStatus' },
+      
+      { id: 'MaintenanceHandler', label: 'MaintenanceHandler', group: 'Handler', title: 'Class: MaintenanceHandler' },
+      { id: 'MaintenanceService', label: 'MaintenanceService', group: 'Service', title: 'Interface: MaintenanceService' },
+      { id: 'MaintenanceRepository', label: 'MaintenanceRepository', group: 'Repository', title: 'Interface: MaintenanceRepository' },
+      { id: 'CreateMaintenance', label: 'CreateMaintenance', group: 'Function', title: 'Method: CreateMaintenance' },
+      { id: 'ConfirmPayment', label: 'ConfirmPayment', group: 'Function', title: 'Method: ConfirmPayment' },
+      
+      { id: 'AssetDeletionHandler', label: 'AssetDeletionHandler', group: 'Handler', title: 'Class: AssetDeletionHandler' },
+      { id: 'AssetDeletionRequestService', label: 'AssetDeletionService', group: 'Service', title: 'Interface: AssetDeletionRequestService' },
+      { id: 'AssetDeletionRequestRepository', label: 'AssetDeletionRepo', group: 'Repository', title: 'Interface: AssetDeletionRequestRepository' },
+      { id: 'CreateRequest', label: 'CreateRequest', group: 'Function', title: 'Method: CreateRequest' },
+      { id: 'ApproveRequest', label: 'ApproveRequest', group: 'Function', title: 'Method: ApproveRequest' },
+      
+      { id: 'UserHandler', label: 'UserHandler', group: 'Handler', title: 'Class: UserHandler' },
+      { id: 'AuthHandler', label: 'AuthHandler', group: 'Handler', title: 'Class: AuthHandler' },
+      { id: 'AuditLogHandler', label: 'AuditLogHandler', group: 'Handler', title: 'Class: AuditLogHandler' },
+      
+      { id: 'InventoryPage', label: 'InventoryPage (React)', group: 'Component', title: 'Page: /inventory' },
+      { id: 'BorrowingsPage', label: 'BorrowingsPage (React)', group: 'Component', title: 'Page: /borrowings' },
+      { id: 'MaintenancePage', label: 'MaintenancePage (React)', group: 'Component', title: 'Page: /maintenance' },
+      { id: 'AuditLogsPage', label: 'AuditLogsPage (React)', group: 'Component', title: 'Page: /audit-logs' },
+      { id: 'ApprovalPage', label: 'ApprovalPage (React)', group: 'Component', title: 'Page: /approval' },
+      { id: 'AssetDeletionsApprovalPage', label: 'DeletionsApprovalPage (React)', group: 'Component', title: 'Page: /approval/deletions' },
+      { id: 'DashboardLayout', label: 'DashboardLayout (React)', group: 'Component', title: 'Layout: DashboardLayout' },
+      { id: 'Pagination', label: 'Pagination UI', group: 'Component', title: 'Component: Pagination.tsx' },
+      { id: 'PageLoading', label: 'PageLoading UI', group: 'Component', title: 'Component: PageLoading.tsx' },
+      { id: 'ErrorView', label: 'ErrorView UI', group: 'Component', title: 'Component: ErrorView.tsx' },
+      
+      { id: 'public.assets', label: 'DB Table: assets', group: 'Table', title: 'Database Table: assets' },
+      { id: 'public.borrowings', label: 'DB Table: borrowings', group: 'Table', title: 'Database Table: borrowings' },
+      { id: 'public.maintenances', label: 'DB Table: maintenances', group: 'Table', title: 'Database Table: maintenances' },
+      { id: 'public.notifications', label: 'DB Table: notifications', group: 'Table', title: 'Database Table: notifications' }
+    ];
+
+    const rawEdges = [
+      { from: 'AssetHandler', to: 'AssetService', label: 'IMPLEMENTS' },
+      { from: 'AssetService', to: 'AssetRepository', label: 'CALLS' },
+      { from: 'AssetHandler', to: 'CreateAsset', label: 'DEFINES' },
+      { from: 'AssetHandler', to: 'GetAssets', label: 'DEFINES' },
+      { from: 'AssetHandler', to: 'UpdateAsset', label: 'DEFINES' },
+      { from: 'AssetHandler', to: 'DeleteAsset', label: 'DEFINES' },
+      { from: 'AssetRepository', to: 'public.assets', label: 'WRITES' },
+      
+      { from: 'BorrowingHandler', to: 'BorrowingService', label: 'IMPLEMENTS' },
+      { from: 'BorrowingService', to: 'BorrowingRepository', label: 'CALLS' },
+      { from: 'BorrowingHandler', to: 'CreateBorrowing', label: 'DEFINES' },
+      { from: 'BorrowingHandler', to: 'GetBorrowings', label: 'DEFINES' },
+      { from: 'BorrowingHandler', to: 'UpdateBorrowingStatus', label: 'DEFINES' },
+      { from: 'BorrowingRepository', to: 'public.borrowings', label: 'WRITES' },
+      
+      { from: 'MaintenanceHandler', to: 'MaintenanceService', label: 'IMPLEMENTS' },
+      { from: 'MaintenanceService', to: 'MaintenanceRepository', label: 'CALLS' },
+      { from: 'MaintenanceHandler', to: 'CreateMaintenance', label: 'DEFINES' },
+      { from: 'MaintenanceHandler', to: 'ConfirmPayment', label: 'DEFINES' },
+      { from: 'MaintenanceRepository', to: 'public.maintenances', label: 'WRITES' },
+      
+      { from: 'AssetDeletionHandler', to: 'AssetDeletionRequestService', label: 'IMPLEMENTS' },
+      { from: 'AssetDeletionRequestService', to: 'AssetDeletionRequestRepository', label: 'CALLS' },
+      { from: 'AssetDeletionHandler', to: 'CreateRequest', label: 'DEFINES' },
+      { from: 'AssetDeletionHandler', to: 'ApproveRequest', label: 'DEFINES' },
+      { from: 'ApproveRequest', to: 'DeleteAsset', label: 'CALLS' },
+      
+      { from: 'InventoryPage', to: 'AssetHandler', label: 'FETCHES' },
+      { from: 'InventoryPage', to: 'Pagination', label: 'USES' },
+      { from: 'AuditLogsPage', to: 'Pagination', label: 'USES' },
+      { from: 'BorrowingsPage', to: 'BorrowingHandler', label: 'FETCHES' },
+      { from: 'MaintenancePage', to: 'MaintenanceHandler', label: 'FETCHES' },
+      { from: 'ApprovalPage', to: 'BorrowingHandler', label: 'FETCHES' },
+      { from: 'AssetDeletionsApprovalPage', to: 'AssetDeletionHandler', label: 'FETCHES' },
+      { from: 'DashboardLayout', to: 'PageLoading', label: 'USES' },
+      { from: 'DashboardLayout', to: 'ErrorView', label: 'USES' }
+    ];
+
+    // Colors mapping per group
+    const groupColors = {
+      Route: { background: '#10B981', border: '#059669' },
+      Handler: { background: '#3B82F6', border: '#1D4ED8' },
+      Service: { background: '#06B6D4', border: '#0891B2' },
+      Repository: { background: '#8B5CF6', border: '#6D28D9' },
+      Function: { background: '#F97316', border: '#EA580C' },
+      Component: { background: '#F59E0B', border: '#D97706' },
+      Table: { background: '#EC4899', border: '#BE185D' }
+    };
+
+    const nodes = new vis.DataSet(rawNodes.map(n => ({
+      ...n,
+      color: groupColors[n.group] || { background: '#6B7280', border: '#4B5563' },
+      font: { color: '#FFFFFF', face: 'system-ui', size: 12, strokeWidth: 2, strokeColor: '#0B0F17' },
+      shape: 'box',
+      margin: 10,
+      borderWidth: 2
+    })));
+
+    const edges = new vis.DataSet(rawEdges.map(e => ({
+      ...e,
+      arrows: 'to',
+      color: { color: '#4B5563', highlight: '#60A5FA' },
+      font: { color: '#9CA3AF', size: 9, align: 'middle' },
+      smooth: { type: 'cubicBezier', roundness: 0.5 }
+    })));
+
+    const container = document.getElementById('mynetwork');
+    const data = { nodes, edges };
+    const options = {
+      physics: {
+        stabilization: true,
+        barnesHut: {
+          gravitationalConstant: -3000,
+          springLength: 120,
+          springConstant: 0.04
+        }
+      },
+      interaction: {
+        hover: true,
+        tooltipDelay: 100,
+        zoomView: true
+      }
+    };
+
+    const network = new vis.Network(container, data, options);
+    let physicsEnabled = true;
+
+    // Node click handler
+    network.on('click', function (params) {
+      if (params.nodes.length > 0) {
+        const nodeId = params.nodes[0];
+        const nodeData = nodes.get(nodeId);
+        showInspector(nodeData);
+      } else {
+        closeInspector();
+      }
+    });
+
+    function showInspector(node) {
+      const inspector = document.getElementById('inspector');
+      document.getElementById('inspectorTitle').innerText = node.label;
+      document.getElementById('inspectorType').innerText = node.group;
+      document.getElementById('inspectorDetail').innerText = node.title || 'Detail node grafic SAIMS';
+      inspector.classList.remove('hidden');
+    }
+
+    function closeInspector() {
+      document.getElementById('inspector').classList.add('hidden');
+    }
+
+    function resetZoom() {
+      network.fit({ animation: true });
+    }
+
+    function togglePhysics() {
+      physicsEnabled = !physicsEnabled;
+      network.setOptions({ physics: { enabled: physicsEnabled } });
+      const btn = document.getElementById('physicsBtn');
+      btn.innerText = 'Physics: ' + (physicsEnabled ? 'ON' : 'OFF');
+      btn.className = physicsEnabled 
+        ? 'px-3 py-2 bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white rounded-xl transition-all'
+        : 'px-3 py-2 bg-gray-700 hover:bg-gray-600 text-xs font-semibold text-gray-300 rounded-xl transition-all';
+    }
+
+    function filterNodes() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      if (!query) {
+        resetZoom();
+        return;
+      }
+      const matchNode = nodes.get().find(n => n.label.toLowerCase().includes(query) || n.id.toLowerCase().includes(query));
+      if (matchNode) {
+        network.focus(matchNode.id, { scale: 1.5, animation: true });
+        showInspector(matchNode);
+      }
+    }
+  </script>
+</body>
+</html>

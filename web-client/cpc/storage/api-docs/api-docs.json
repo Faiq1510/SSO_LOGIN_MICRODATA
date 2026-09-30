@@ -1,0 +1,1709 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Sistem Kontrol Perumahan",
+        "description": "Dokumentasi API untuk modul unit, material, gudang, progress, dan keuangan",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost",
+            "description": "API Server"
+        }
+    ],
+    "paths": {
+        "/finance/akun-referensi": {
+            "get": {
+                "tags": [
+                    "Keuangan - Akun Referensi"
+                ],
+                "summary": "List akun referensi",
+                "operationId": "dc2c49fdb90428085c647214a5284a78",
+                "responses": {
+                    "200": {
+                        "description": "Halaman daftar akun referensi"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Keuangan - Akun Referensi"
+                ],
+                "summary": "Tambah akun referensi",
+                "operationId": "5dbad4566e18067bd4f33902d55bd2fc",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah akun referensi dibuat"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/finance/akun-referensi/{akunReferensi}": {
+            "put": {
+                "tags": [
+                    "Keuangan - Akun Referensi"
+                ],
+                "summary": "Update akun referensi",
+                "operationId": "a919902a53f14b90dceb58a1d5600a66",
+                "parameters": [
+                    {
+                        "name": "akunReferensi",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah akun referensi diperbarui"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Keuangan - Akun Referensi"
+                ],
+                "summary": "Hapus akun referensi",
+                "operationId": "85e788e3f7bfcd8e22bc2327b4958410",
+                "parameters": [
+                    {
+                        "name": "akunReferensi",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah akun referensi dihapus"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/finance/laba-rugi": {
+            "get": {
+                "tags": [
+                    "Keuangan - Laporan"
+                ],
+                "summary": "Laporan Laba Rugi",
+                "operationId": "c5b2fbcd48e305601dc52896d9acc63b",
+                "parameters": [
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Halaman laporan laba rugi"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/finance/arus-kas": {
+            "get": {
+                "tags": [
+                    "Keuangan - Laporan"
+                ],
+                "summary": "Halaman arus kas",
+                "operationId": "7624c57d28c94b79231cd76f48a6160a",
+                "parameters": [
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Halaman arus kas"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/finance/arus-kas/export": {
+            "get": {
+                "tags": [
+                    "Keuangan - Laporan"
+                ],
+                "summary": "Export PDF arus kas",
+                "description": "Export PDF Arus Kas",
+                "operationId": "16728ca8b75ab2f5f24c6c8fb162abe5",
+                "parameters": [
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "PDF arus kas ditampilkan"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/finance/hpp-per-unit": {
+            "get": {
+                "tags": [
+                    "Keuangan - HPP"
+                ],
+                "summary": "Halaman HPP per unit",
+                "operationId": "1f265af4196bd04eedd3d1dd1fa04c9a",
+                "parameters": [
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Halaman HPP per unit"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/finance/kartu-material-unit": {
+            "get": {
+                "tags": [
+                    "Keuangan - Kartu Material Unit"
+                ],
+                "summary": "Halaman kartu material per unit",
+                "operationId": "d4c1801cdda0b275f65a0535cbce1879",
+                "responses": {
+                    "200": {
+                        "description": "Halaman kartu material unit"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/finance/kas-keluar": {
+            "get": {
+                "tags": [
+                    "Keuangan - Kas Keluar"
+                ],
+                "summary": "List kas keluar",
+                "operationId": "2afeaa9203c9b3740ca3148415d0f2ff",
+                "responses": {
+                    "200": {
+                        "description": "Halaman kas keluar"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Keuangan - Kas Keluar"
+                ],
+                "summary": "Tambah kas keluar",
+                "operationId": "ed99685b50a54d8730284581a6897987",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah kas keluar dicatat"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/finance/kas-keluar/{kasKeluar}": {
+            "put": {
+                "tags": [
+                    "Keuangan - Kas Keluar"
+                ],
+                "summary": "Update kas keluar",
+                "operationId": "ba60214e0d12eda49ac8b67e91f6d679",
+                "parameters": [
+                    {
+                        "name": "kasKeluar",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah kas keluar diperbarui"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Keuangan - Kas Keluar"
+                ],
+                "summary": "Hapus kas keluar",
+                "operationId": "3c347cbb11a297ef2ae57fae4e1b09e9",
+                "parameters": [
+                    {
+                        "name": "kasKeluar",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah kas keluar dihapus"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/finance/kas-masuk": {
+            "get": {
+                "tags": [
+                    "Keuangan - Kas Masuk"
+                ],
+                "summary": "List kas masuk",
+                "operationId": "a1b0fa4c7e0c27793884e8ac13fc0227",
+                "responses": {
+                    "200": {
+                        "description": "Halaman kas masuk"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Keuangan - Kas Masuk"
+                ],
+                "summary": "Tambah kas masuk",
+                "operationId": "4e2e03a6276a474f3296ac54caa62497",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah kas masuk dicatat"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/finance/kas-masuk/{kasMasuk}": {
+            "put": {
+                "tags": [
+                    "Keuangan - Kas Masuk"
+                ],
+                "summary": "Update kas masuk",
+                "operationId": "f7df8db25b3a31c035c81b79918eef92",
+                "parameters": [
+                    {
+                        "name": "kasMasuk",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah kas masuk diperbarui"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Keuangan - Kas Masuk"
+                ],
+                "summary": "Hapus kas masuk",
+                "operationId": "1c67bdd71aa8d0adb6d674546f18512f",
+                "parameters": [
+                    {
+                        "name": "kasMasuk",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah kas masuk dihapus"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/log-gudang": {
+            "get": {
+                "tags": [
+                    "Gudang"
+                ],
+                "summary": "Halaman log masuk/keluar gudang",
+                "operationId": "76ea566ffdc3b47928dd69b9b6bf54b2",
+                "parameters": [
+                    {
+                        "name": "tab",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort_dir",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Halaman log gudang"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/stok-gudang": {
+            "get": {
+                "tags": [
+                    "Gudang"
+                ],
+                "summary": "Stok gudang paginated",
+                "operationId": "43df6f3b0c8a8114bbab4a44e0fbe696",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sortBy",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sortDir",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "perPage",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Halaman stok gudang"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/log-gudang/history": {
+            "get": {
+                "tags": [
+                    "Gudang"
+                ],
+                "summary": "Riwayat perubahan log gudang",
+                "operationId": "b608d84ed30ecadc8d351b2ef5b24277",
+                "responses": {
+                    "200": {
+                        "description": "Riwayat log gudang"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/log-gudang/masuk": {
+            "post": {
+                "tags": [
+                    "Gudang"
+                ],
+                "summary": "Tambah log masuk gudang",
+                "operationId": "f159772140bfe8f5eb8f375df15b46f1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah log masuk dibuat"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/log-gudang/masuk/{logMasuk}": {
+            "put": {
+                "tags": [
+                    "Gudang"
+                ],
+                "summary": "Update log masuk gudang",
+                "operationId": "94516e00988690b44851a138045c0651",
+                "parameters": [
+                    {
+                        "name": "logMasuk",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah log masuk diperbarui"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Gudang"
+                ],
+                "summary": "Soft-delete log masuk gudang",
+                "operationId": "e62cd291c2ed74123a82bda9fa4263ad",
+                "parameters": [
+                    {
+                        "name": "logMasuk",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah log masuk dihapus"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/log-gudang/masuk/{id}/force": {
+            "delete": {
+                "tags": [
+                    "Gudang"
+                ],
+                "summary": "Force-delete log masuk gudang",
+                "operationId": "f709f5a87e7155de35795dd7417ce3c5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah log masuk dihapus permanen"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/log-gudang/keluar": {
+            "post": {
+                "tags": [
+                    "Gudang"
+                ],
+                "summary": "Tambah log keluar gudang (multi-unit)",
+                "operationId": "013fefef055868ca98007e6db9b9bedc",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah log keluar dibuat"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/log-gudang/keluar/{logKeluar}": {
+            "put": {
+                "tags": [
+                    "Gudang"
+                ],
+                "summary": "Update log keluar gudang",
+                "operationId": "493a10e08ef0b8d3ecba53ad18379ce9",
+                "parameters": [
+                    {
+                        "name": "logKeluar",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah log keluar diperbarui"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Gudang"
+                ],
+                "summary": "Soft-delete log keluar gudang",
+                "operationId": "47407d5147159d6fb931e0ec87c7f693",
+                "parameters": [
+                    {
+                        "name": "logKeluar",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah log keluar dihapus"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/log-gudang/keluar/{id}/force": {
+            "delete": {
+                "tags": [
+                    "Gudang"
+                ],
+                "summary": "Force-delete log keluar gudang",
+                "operationId": "28cf2d16dd8afe31e7df36bbbc2d46df",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah log keluar dihapus permanen"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/material": {
+            "get": {
+                "tags": [
+                    "Material"
+                ],
+                "summary": "List material",
+                "operationId": "9dde6d4798ee28e1b90889e21f481a77",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "kategori",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sortBy",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sortDir",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Halaman daftar material"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Material"
+                ],
+                "summary": "Tambah material baru",
+                "operationId": "ef4cc812b7fa1b71305731827c08d0d8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "description": "Payload material baru",
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah material dibuat"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/material/{material}": {
+            "put": {
+                "tags": [
+                    "Material"
+                ],
+                "summary": "Update material",
+                "operationId": "e954b6bbed5abaef01fa895fd5449e51",
+                "parameters": [
+                    {
+                        "name": "material",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "description": "Data update material",
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah material diperbarui"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Material"
+                ],
+                "summary": "Hapus material",
+                "operationId": "d13950e2e7aae79a80f58678a17d1347",
+                "parameters": [
+                    {
+                        "name": "material",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah material dihapus"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/finance/neraca": {
+            "get": {
+                "tags": [
+                    "Keuangan - Neraca"
+                ],
+                "summary": "Halaman neraca",
+                "operationId": "28b68aaff936e2f4a78313dbd0276419",
+                "parameters": [
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Halaman neraca"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/finance/neraca/export": {
+            "get": {
+                "tags": [
+                    "Keuangan - Neraca"
+                ],
+                "summary": "Export PDF neraca",
+                "operationId": "ce957cc933624938e67b189857eb3ef8",
+                "parameters": [
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "PDF neraca ditampilkan"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/notifications/{activityLog}/read": {
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Tandai notifikasi sebagai dibaca",
+                "operationId": "4e3392cfd2d12a9cc41042b627f947d9",
+                "parameters": [
+                    {
+                        "name": "activityLog",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah notifikasi dibaca"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/profile": {
+            "get": {
+                "tags": [
+                    "User - Profile"
+                ],
+                "summary": "Lihat profil pengguna",
+                "operationId": "3c91ae2e201145a495a0b5696c6b8901",
+                "responses": {
+                    "200": {
+                        "description": "Halaman profil pengguna"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "User - Profile"
+                ],
+                "summary": "Hapus akun pengguna",
+                "operationId": "1d6a5c6489e35a763aa97ebef12863ce",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah akun dihapus"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "User - Profile"
+                ],
+                "summary": "Update profil pengguna",
+                "operationId": "354f5b23296bed4036564563e7423f43",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah profil diperbarui"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/progress": {
+            "get": {
+                "tags": [
+                    "Progress"
+                ],
+                "summary": "Monitoring progress seluruh unit",
+                "operationId": "cb2f01e9fb0d5710100226aea0d7c27c",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "standar",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Halaman monitoring progress"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Progress"
+                ],
+                "summary": "Update progress unit",
+                "operationId": "82f17e58de7c903f5402c08cd04f3f0d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah progress diperbarui"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/finance/kas-flow": {
+            "get": {
+                "tags": [
+                    "Keuangan - SPJ"
+                ],
+                "summary": "Halaman kas flow SPJ",
+                "operationId": "7b402dfb07b79961704318274a75a15e",
+                "parameters": [
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Halaman kas flow"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/finance/kas-flow/export": {
+            "get": {
+                "tags": [
+                    "Keuangan - SPJ"
+                ],
+                "summary": "Export PDF kas flow SPJ",
+                "operationId": "1a07fa6921e3efcbf88a01d1061c727b",
+                "parameters": [
+                    {
+                        "name": "bulan",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "tahun",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "PDF kas flow ditampilkan"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/unit": {
+            "get": {
+                "tags": [
+                    "Unit"
+                ],
+                "summary": "List semua unit",
+                "operationId": "46c7c47c48c0f4080533010a3f1dfb2c",
+                "responses": {
+                    "200": {
+                        "description": "Halaman daftar unit"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Unit"
+                ],
+                "summary": "Tambah unit baru",
+                "operationId": "b7716468441dc7faa754e4f84372a236",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "description": "Payload unit baru",
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah unit dibuat"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/unit/{unit}": {
+            "put": {
+                "tags": [
+                    "Unit"
+                ],
+                "summary": "Update unit",
+                "operationId": "4171397d175a67d4d570282a36aa8e46",
+                "parameters": [
+                    {
+                        "name": "unit",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "description": "Data update unit",
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah unit diperbarui"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Unit"
+                ],
+                "summary": "Hapus satu unit",
+                "operationId": "88c569b547e4571528ee03eb4387dd86",
+                "parameters": [
+                    {
+                        "name": "unit",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah unit dihapus"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/unit/bulk-destroy": {
+            "delete": {
+                "tags": [
+                    "Unit"
+                ],
+                "summary": "Hapus banyak unit sekaligus",
+                "operationId": "5d5208bd806ef7b1e94722e192ea7b5b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah unit dihapus"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/user-role": {
+            "get": {
+                "tags": [
+                    "Admin - User Role"
+                ],
+                "summary": "Daftar user role",
+                "operationId": "cf10ef8938dc5eb27858934a0ffb8b65",
+                "parameters": [
+                    {
+                        "name": "role",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Halaman daftar pengguna"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin - User Role"
+                ],
+                "summary": "Tambah user baru",
+                "operationId": "f7de4ea2e10b62d4b89048b763d0f795",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah user dibuat"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/user-role/{user}": {
+            "put": {
+                "tags": [
+                    "Admin - User Role"
+                ],
+                "summary": "Update user",
+                "operationId": "662ebffdf871be26368399599f9c1cbb",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah user diperbarui"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/users/{user}/toggle": {
+            "patch": {
+                "tags": [
+                    "Admin - User Role"
+                ],
+                "summary": "Toggle status user",
+                "operationId": "4d0283490b1f9de653c52510950548e4",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Redirect setelah status user diubah"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "sanctum": {
+                "type": "http",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Keuangan - Akun Referensi",
+            "description": "Manajemen akun referensi untuk laporan dan jurnal"
+        },
+        {
+            "name": "Keuangan - Laporan",
+            "description": "Laporan keuangan dan ekspor PDF"
+        },
+        {
+            "name": "Keuangan - HPP",
+            "description": "Laporan HPP per unit"
+        },
+        {
+            "name": "Keuangan - Kartu Material Unit",
+            "description": "Laporan penggunaan material per unit"
+        },
+        {
+            "name": "Keuangan - Kas Keluar",
+            "description": "Manajemen kas keluar"
+        },
+        {
+            "name": "Keuangan - Kas Masuk",
+            "description": "Manajemen kas masuk"
+        },
+        {
+            "name": "Gudang",
+            "description": "Manajemen log dan stok gudang"
+        },
+        {
+            "name": "Material",
+            "description": "Manajemen material"
+        },
+        {
+            "name": "Keuangan - Neraca",
+            "description": "Laporan neraca dan ekspor PDF"
+        },
+        {
+            "name": "Notifications",
+            "description": "Tindakan notifikasi pengguna"
+        },
+        {
+            "name": "User - Profile",
+            "description": "Aksi profil pengguna dan OTP untuk email/password"
+        },
+        {
+            "name": "Progress",
+            "description": "Monitoring dan update progress unit"
+        },
+        {
+            "name": "Keuangan - SPJ",
+            "description": "Laporan kas flow dan ekspor SPJ"
+        },
+        {
+            "name": "Unit",
+            "description": "Manajemen unit"
+        },
+        {
+            "name": "Admin - User Role",
+            "description": "Manajemen user roles, status, dan menu override"
+        }
+    ]
+}

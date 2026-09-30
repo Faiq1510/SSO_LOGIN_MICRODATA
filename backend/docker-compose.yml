@@ -20,6 +20,7 @@ services:
 
     volumes:
       - ./src:/app/src
+      - ./swagger.yaml:/app/swagger.yaml
       - ../frontend:/app/public
 
     depends_on:

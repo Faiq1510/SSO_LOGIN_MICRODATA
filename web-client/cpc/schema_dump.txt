@@ -1,0 +1,3040 @@
+﻿---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2025_01_01_000000_create_otp_codes_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('otp_codes', function (Blueprint $table) {
+            $table->id();
+            $table->string('email');
+            $table->string('otp', 6);
+            $table->string('purpose'); // 'change_email' | 'forgot_password'
+            $table->json('payload')->nullable(); // data tambahan, mis. user_id, email_lama
+            $table->timestamp('expires_at');
+            $table->timestamp('verified_at')->nullable();
+            $table->timestamps();
+
+            $table->index(['email', 'purpose']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('otp_codes');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_07_080710_create_sessions_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('sessions', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->foreignId('user_id')->nullable()->index();
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->longText('payload');
+            $table->integer('last_activity')->index();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('sessions');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_08_000001_create_users_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('users', function (Blueprint $table) {
+
+            $table->id();
+
+            // Data User
+            $table->string('name',100);
+            $table->string('username',50)->unique();
+            $table->string('email',150)->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password',255);
+            $table->boolean('is_active')->default(true);
+            $table->timestamp('last_login_at')->nullable();
+
+            // Laravel
+            $table->rememberToken();
+            $table->timestamps();
+
+            $table->string('avatar')->nullable();
+            $table->string('photo')->nullable();
+
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+$table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('users');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_08_000002_create_cache_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('cache', function (Blueprint $table) {
+            $table->string('key')->primary();
+            $table->mediumText('value');
+            $table->integer('expiration');
+        });
+
+        Schema::create('cache_locks', function (Blueprint $table) {
+            $table->string('key')->primary();
+            $table->string('owner');
+            $table->integer('expiration');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('cache');
+        Schema::dropIfExists('cache_locks');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_08_000003_create_jobs_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('jobs', function (Blueprint $table) {
+            $table->id();
+            $table->string('queue')->index();
+            $table->longText('payload');
+            $table->unsignedTinyInteger('attempts');
+            $table->unsignedInteger('reserved_at')->nullable();
+            $table->unsignedInteger('available_at');
+            $table->unsignedInteger('created_at');
+        });
+
+        Schema::create('job_batches', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->string('name');
+            $table->integer('total_jobs');
+            $table->integer('pending_jobs');
+            $table->integer('failed_jobs');
+            $table->longText('failed_job_ids');
+            $table->mediumText('options')->nullable();
+            $table->integer('cancelled_at')->nullable();
+            $table->integer('created_at');
+            $table->integer('finished_at')->nullable();
+        });
+
+        Schema::create('failed_jobs', function (Blueprint $table) {
+            $table->id();
+            $table->string('uuid')->unique();
+            $table->text('connection');
+            $table->text('queue');
+            $table->longText('payload');
+            $table->longText('exception');
+            $table->timestamp('failed_at')->useCurrent();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('failed_jobs');
+        Schema::dropIfExists('job_batches');
+        Schema::dropIfExists('jobs');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_08_085612_create_units_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('units', function (Blueprint $table) {
+
+            // Primary Key
+            $table->id();
+
+            // Informasi Unit
+            $table->string('nama_unit', 50)->unique();
+            $table->string('zona', 20);
+            $table->string('status', 20)->default('Aktif');
+            $table->string('tukang', 100);
+
+            // Tanggal Mulai Pembangunan
+            $table->date('tanggal_mulai')->nullable();
+
+            // Keterangan Tambahan
+            $table->text('keterangan')->nullable();
+
+            // Timestamp Laravel
+            $table->timestamps();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Index
+            |--------------------------------------------------------------------------
+            */
+
+            $table->index('zona');
+            $table->index('status');
+            $table->index('tanggal_mulai');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('units');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_08_085819_create_materials_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('materials', function (Blueprint $table) {
+
+            // Primary Key
+            $table->id();
+
+            // Data Material
+            $table->string('kode_material', 20)->unique();
+            $table->string('nama_material', 100);
+            $table->string('satuan', 20);
+            $table->string('kategori', 50);
+
+            // Harga
+            $table->decimal('harga', 15, 2)->default(0);
+
+            // Timestamp
+            $table->timestamps();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Index
+            |--------------------------------------------------------------------------
+            */
+
+            $table->index('nama_material');
+            $table->index('kategori');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('materials');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_08_085914_create_log_masuk_gudang_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('log_masuk_gudang', function (Blueprint $table) {
+
+            // Primary Key
+            $table->id();
+
+            // Informasi Transaksi
+            $table->date('tanggal');
+            $table->string('supplier', 100);
+
+            // Relasi Material
+            $table->foreignId('material_id')
+                ->constrained('materials')
+                ->cascadeOnUpdate()
+                ->restrictOnDelete();
+
+            // Jumlah Barang
+            $table->decimal('qty', 15, 2);
+
+            // Harga
+            $table->decimal('harga_satuan', 15, 2);
+
+            // Total Harga
+            $table->decimal('total_harga', 15, 2);
+
+            // Catatan
+            $table->text('keterangan')->nullable();
+
+            // User yang menginput
+            $table->foreignId('created_by')
+                ->constrained('users')
+                ->cascadeOnUpdate()
+                ->restrictOnDelete();
+
+            $table->timestamps();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Index
+            |--------------------------------------------------------------------------
+            */
+
+            $table->index(['material_id', 'tanggal']);
+            $table->index('supplier');
+            $table->index('created_by');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('log_masuk_gudang');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_08_085944_create_log_keluar_harian_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('log_keluar_harian', function (Blueprint $table) {
+
+            // Primary Key
+            $table->id();
+
+            // Tanggal Pengeluaran
+            $table->date('tanggal');
+
+            // Unit Tujuan
+            $table->foreignId('unit_id')
+                ->constrained('units')
+                ->cascadeOnUpdate()
+                ->restrictOnDelete();
+
+            // Material
+            $table->foreignId('material_id')
+                ->constrained('materials')
+                ->cascadeOnUpdate()
+                ->restrictOnDelete();
+
+            // Jumlah Material
+            $table->decimal('qty', 15, 2);
+
+            // Harga Material Saat Digunakan
+            $table->decimal('harga', 15, 2);
+
+            // Total = qty Ã— harga
+            $table->decimal('total', 15, 2);
+
+            // Catatan
+            $table->text('keterangan')->nullable();
+
+            // User yang menginput
+            $table->foreignId('created_by')
+                ->constrained('users')
+                ->cascadeOnUpdate()
+                ->restrictOnDelete();
+
+            $table->timestamps();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Index
+            |--------------------------------------------------------------------------
+            */
+
+            $table->index(['unit_id', 'material_id', 'tanggal']);
+            $table->index('tanggal');
+            $table->index('created_by');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('log_keluar_harian');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_08_090018_create_matrix_progress_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('matrix_progress', function (Blueprint $table) {
+
+            // Primary Key
+            $table->id();
+
+            // Persentase maksimum progress
+            $table->unsignedInteger('batas_atas');
+
+            // Contoh: 0-5, 6-10
+            $table->string('range_progress', 20);
+
+            // Nama tahap pekerjaan
+            $table->string('tahap_pekerjaan', 100);
+
+            $table->timestamps();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Index
+            |--------------------------------------------------------------------------
+            */
+
+            $table->unique('batas_atas');
+            $table->index('range_progress');
+            $table->index('tahap_pekerjaan');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('matrix_progress');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_08_090044_create_matrix_progress_detail_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('matrix_progress_detail', function (Blueprint $table) {
+
+            // Primary Key
+            $table->id();
+
+            // Relasi ke matrix_progress
+            $table->foreignId('matrix_id')
+                ->constrained('matrix_progress')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
+
+            // Relasi ke materials
+            $table->foreignId('material_id')
+                ->constrained('materials')
+                ->cascadeOnUpdate()
+                ->restrictOnDelete();
+
+            // Jumlah standar material
+            $table->decimal('qty_standar', 15, 2);
+
+            $table->timestamps();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Constraint
+            |--------------------------------------------------------------------------
+            */
+
+            // Satu material hanya boleh muncul sekali dalam satu tahap progress
+            $table->unique(['matrix_id', 'material_id']);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Index
+            |--------------------------------------------------------------------------
+            */
+
+            $table->index('matrix_id');
+            $table->index('material_id');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('matrix_progress_detail');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_08_090107_create_progress_unit_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('progress_unit', function (Blueprint $table) {
+            $table->id();
+
+            // Relasi ke unit
+            $table->foreignId('unit_id')
+                  ->constrained('units')
+                  ->cascadeOnUpdate()
+                  ->cascadeOnDelete();
+
+            // Progress dalam persentase (0â€“100), sudah integer final
+            $table->unsignedTinyInteger('progress_percent')->default(0);
+
+            // Tanggal update progress
+            $table->date('tanggal_update')->nullable();
+
+            // Status progress (e.g. 'Berjalan', 'Selesai')
+            $table->enum('status', [
+                'NOT STARTED',
+                'ON PROGRESS',
+                'DONE'
+            ])->default('NOT STARTED');
+
+            // Info material (ditambahkan via migration 2026_07_14, digabung di sini)
+            $table->string('status_material')->nullable();
+            $table->json('detail_material')->nullable();
+
+            // Relasi ke user yang mengupdate
+            $table->foreignId('updated_by')
+                ->constrained('users')
+                ->cascadeOnUpdate()
+                ->restrictOnDelete();
+
+            $table->timestamps();
+
+            $table->index(['unit_id', 'tanggal_update']);
+            $table->index('status');
+            $table->index('updated_by');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('progress_unit');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_08_090129_add_batas_threshold_to_matrix_progress_detail_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('matrix_progress_detail', function (Blueprint $table) {
+             // Ambang batas WARNING (kelipatan dari qty_standar)
+             // default 1.00 = kelebihan sedikit aja langsung warning (kaya Pasir, Split, Besi, dll)
+             $table->decimal('batas_warning', 5, 2)->default(1.00)->after('qty_standar');
+             // Ambang batas BOROS (kelipatan dari qty_standar)
+             // default 1.15 = lewat 115% standar baru dianggap boros
+            $table->decimal('batas_boros', 5, 2)->default(1.15)->after('batas_warning');
+        });
+}
+
+    public function down(): void
+    {
+        Schema::table('matrix_progress_detail', function (Blueprint $table) {
+            $table->dropColumn(['batas_warning', 'batas_boros']);
+        });
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_08_090130_create_monitoring_views.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | VIEW : STOK GUDANG
+        |--------------------------------------------------------------------------
+        */
+
+        DB::statement("DROP VIEW IF EXISTS v_stok_gudang;");
+
+        DB::statement("
+            CREATE VIEW v_stok_gudang AS
+            SELECT
+                m.id AS material_id,
+                m.kode_material,
+                m.nama_material,
+
+                COALESCE(SUM(lm.qty),0) AS total_masuk,
+                COALESCE(SUM(lk.qty),0) AS total_keluar,
+
+                COALESCE(SUM(lm.qty),0)
+                -
+                COALESCE(SUM(lk.qty),0)
+                AS sisa_stok
+
+            FROM materials m
+
+            LEFT JOIN log_masuk_gudang lm
+                ON lm.material_id = m.id
+
+            LEFT JOIN log_keluar_harian lk
+                ON lk.material_id = m.id
+
+            GROUP BY
+                m.id,
+                m.kode_material,
+                m.nama_material
+        ");
+
+        /*
+        |--------------------------------------------------------------------------
+        | VIEW : MONITORING PROGRESS
+        |--------------------------------------------------------------------------
+        */
+
+        DB::statement("DROP VIEW IF EXISTS v_monitoring_progress;");
+
+        DB::statement("
+            CREATE VIEW v_monitoring_progress AS
+
+            SELECT
+
+                pu.unit_id,
+
+                u.nama_unit,
+
+                pu.progress_percent,
+
+                mp.tahap_pekerjaan,
+
+                mpd.material_id,
+
+                m.nama_material,
+
+                mpd.qty_standar AS standar,
+
+                COALESCE(SUM(lk.qty),0) AS aktual,
+
+                CASE
+                    WHEN COALESCE(SUM(lk.qty),0) > mpd.qty_standar * mpd.batas_boros THEN 'BOROS'
+                    WHEN COALESCE(SUM(lk.qty),0) > mpd.qty_standar * mpd.batas_warning THEN 'WARNING'
+                    ELSE 'AMAN'
+                END AS analisa
+
+            FROM progress_unit pu
+
+            JOIN units u
+                ON u.id = pu.unit_id
+
+            JOIN matrix_progress mp
+                ON mp.batas_atas = (
+                    SELECT MIN(batas_atas)
+                    FROM matrix_progress
+                    WHERE batas_atas >= pu.progress_percent
+                )
+
+            JOIN matrix_progress_detail mpd
+                ON mpd.matrix_id = mp.id
+
+            JOIN materials m
+                ON m.id = mpd.material_id
+
+            LEFT JOIN log_keluar_harian lk
+                ON lk.unit_id = pu.unit_id
+                AND lk.material_id = mpd.material_id
+
+            GROUP BY
+            pu.unit_id,
+            u.nama_unit,
+            pu.progress_percent,
+            mp.tahap_pekerjaan,
+            mpd.material_id,
+            m.nama_material,
+            mpd.qty_standar,
+            mpd.batas_warning,
+            mpd.batas_boros
+        ");
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        DB::statement("DROP VIEW IF EXISTS v_monitoring_progress CASCADE;");
+        DB::statement("DROP VIEW IF EXISTS v_stok_gudang CASCADE;");
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_08_091251_create_permission_tables.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        $teams = config('permission.teams');
+        $tableNames = config('permission.table_names');
+        $columnNames = config('permission.column_names');
+        $pivotRole = $columnNames['role_pivot_key'] ?? 'role_id';
+        $pivotPermission = $columnNames['permission_pivot_key'] ?? 'permission_id';
+
+        throw_if(empty($tableNames), 'Error: config/permission.php not loaded. Run [php artisan config:clear] and try again.');
+        throw_if($teams && empty($columnNames['team_foreign_key'] ?? null), 'Error: team_foreign_key on config/permission.php not loaded. Run [php artisan config:clear] and try again.');
+
+        /**
+         * See `docs/prerequisites.md` for suggested lengths on 'name' and 'guard_name' if "1071 Specified key was too long" errors are encountered.
+         */
+        Schema::create($tableNames['permissions'], static function (Blueprint $table) {
+            $table->id(); // permission id
+            $table->string('name');
+            $table->string('guard_name');
+            $table->timestamps();
+
+            $table->unique(['name', 'guard_name']);
+        });
+
+        /**
+         * See `docs/prerequisites.md` for suggested lengths on 'name' and 'guard_name' if "1071 Specified key was too long" errors are encountered.
+         */
+        Schema::create($tableNames['roles'], static function (Blueprint $table) use ($teams, $columnNames) {
+            $table->id(); // role id
+            if ($teams || config('permission.testing')) { // permission.testing is a fix for sqlite testing
+                $table->unsignedBigInteger($columnNames['team_foreign_key'])->nullable();
+                $table->index($columnNames['team_foreign_key'], 'roles_team_foreign_key_index');
+            }
+            $table->string('name');
+            $table->string('guard_name');
+            $table->timestamps();
+            if ($teams || config('permission.testing')) {
+                $table->unique([$columnNames['team_foreign_key'], 'name', 'guard_name']);
+            } else {
+                $table->unique(['name', 'guard_name']);
+            }
+        });
+
+        Schema::create($tableNames['model_has_permissions'], static function (Blueprint $table) use ($tableNames, $columnNames, $pivotPermission, $teams) {
+            $table->unsignedBigInteger($pivotPermission);
+
+            $table->string('model_type');
+            $table->unsignedBigInteger($columnNames['model_morph_key']);
+            $table->index([$columnNames['model_morph_key'], 'model_type'], 'model_has_permissions_model_id_model_type_index');
+
+            $table->foreign($pivotPermission)
+                ->references('id') // permission id
+                ->on($tableNames['permissions'])
+                ->cascadeOnDelete();
+            if ($teams) {
+                $table->unsignedBigInteger($columnNames['team_foreign_key']);
+                $table->index($columnNames['team_foreign_key'], 'model_has_permissions_team_foreign_key_index');
+
+                $table->primary([$columnNames['team_foreign_key'], $pivotPermission, $columnNames['model_morph_key'], 'model_type'],
+                    'model_has_permissions_permission_model_type_primary');
+            } else {
+                $table->primary([$pivotPermission, $columnNames['model_morph_key'], 'model_type'],
+                    'model_has_permissions_permission_model_type_primary');
+            }
+        });
+
+        Schema::create($tableNames['model_has_roles'], static function (Blueprint $table) use ($tableNames, $columnNames, $pivotRole, $teams) {
+            $table->unsignedBigInteger($pivotRole);
+
+            $table->string('model_type');
+            $table->unsignedBigInteger($columnNames['model_morph_key']);
+            $table->index([$columnNames['model_morph_key'], 'model_type'], 'model_has_roles_model_id_model_type_index');
+
+            $table->foreign($pivotRole)
+                ->references('id') // role id
+                ->on($tableNames['roles'])
+                ->cascadeOnDelete();
+            if ($teams) {
+                $table->unsignedBigInteger($columnNames['team_foreign_key']);
+                $table->index($columnNames['team_foreign_key'], 'model_has_roles_team_foreign_key_index');
+
+                $table->primary([$columnNames['team_foreign_key'], $pivotRole, $columnNames['model_morph_key'], 'model_type'],
+                    'model_has_roles_role_model_type_primary');
+            } else {
+                $table->primary([$pivotRole, $columnNames['model_morph_key'], 'model_type'],
+                    'model_has_roles_role_model_type_primary');
+            }
+        });
+
+        Schema::create($tableNames['role_has_permissions'], static function (Blueprint $table) use ($tableNames, $pivotRole, $pivotPermission) {
+            $table->unsignedBigInteger($pivotPermission);
+            $table->unsignedBigInteger($pivotRole);
+
+            $table->foreign($pivotPermission)
+                ->references('id') // permission id
+                ->on($tableNames['permissions'])
+                ->cascadeOnDelete();
+
+            $table->foreign($pivotRole)
+                ->references('id') // role id
+                ->on($tableNames['roles'])
+                ->cascadeOnDelete();
+
+            $table->primary([$pivotPermission, $pivotRole], 'role_has_permissions_permission_id_role_id_primary');
+        });
+
+        app('cache')
+            ->store(config('permission.cache.store') != 'default' ? config('permission.cache.store') : null)
+            ->forget(config('permission.cache.key'));
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        $tableNames = config('permission.table_names');
+
+        throw_if(empty($tableNames), 'Error: config/permission.php not found and defaults could not be merged. Please publish the package configuration before proceeding, or drop the tables manually.');
+
+        Schema::dropIfExists($tableNames['role_has_permissions']);
+        Schema::dropIfExists($tableNames['model_has_roles']);
+        Schema::dropIfExists($tableNames['model_has_permissions']);
+        Schema::dropIfExists($tableNames['roles']);
+        Schema::dropIfExists($tableNames['permissions']);
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_13_044847_make_tukang_nullable_on_units_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        DB::statement('DROP VIEW IF EXISTS v_monitoring_progress;');
+        DB::statement('DROP VIEW IF EXISTS v_stok_gudang;');
+
+        Schema::table('units', function (Blueprint $table) {
+            $table->string('tukang', 100)->nullable()->change();
+        });
+
+        DB::statement($this->createVStokGudangSql());
+        DB::statement($this->createVMonitoringProgressSql());
+    }
+
+    public function down(): void
+    {
+        DB::statement('DROP VIEW IF EXISTS v_monitoring_progress;');
+        DB::statement('DROP VIEW IF EXISTS v_stok_gudang;');
+
+        Schema::table('units', function (Blueprint $table) {
+            $table->string('tukang', 100)->nullable(false)->change();
+        });
+
+        DB::statement($this->createVStokGudangSql());
+        DB::statement($this->createVMonitoringProgressSql());
+    }
+
+    protected function createVStokGudangSql(): string
+    {
+        return <<<'SQL'
+CREATE VIEW v_stok_gudang AS
+SELECT
+    m.id AS material_id,
+    m.kode_material,
+    m.nama_material,
+    COALESCE(SUM(lm.qty), 0) AS total_masuk,
+    COALESCE(SUM(lk.qty), 0) AS total_keluar,
+    COALESCE(SUM(lm.qty), 0) - COALESCE(SUM(lk.qty), 0) AS sisa_stok
+FROM materials m
+LEFT JOIN log_masuk_gudang lm ON lm.material_id = m.id
+LEFT JOIN log_keluar_harian lk ON lk.material_id = m.id
+GROUP BY
+    m.id,
+    m.kode_material,
+    m.nama_material;
+SQL;
+    }
+
+    protected function createVMonitoringProgressSql(): string
+    {
+        return <<<'SQL'
+CREATE VIEW v_monitoring_progress AS
+SELECT
+    pu.unit_id,
+    u.nama_unit,
+    pu.progress_percent,
+    mp.tahap_pekerjaan,
+    mpd.material_id,
+    m.nama_material,
+    mpd.qty_standar AS standar,
+    COALESCE(SUM(lk.qty), 0) AS aktual,
+    CASE
+        WHEN COALESCE(SUM(lk.qty), 0) > mpd.qty_standar * mpd.batas_boros THEN 'BOROS'
+        WHEN COALESCE(SUM(lk.qty), 0) > mpd.qty_standar * mpd.batas_warning THEN 'WARNING'
+        ELSE 'AMAN'
+    END AS analisa
+FROM progress_unit pu
+JOIN units u ON u.id = pu.unit_id
+JOIN matrix_progress mp ON mp.batas_atas = (
+    SELECT MIN(batas_atas)
+    FROM matrix_progress
+    WHERE batas_atas >= pu.progress_percent
+)
+JOIN matrix_progress_detail mpd ON mpd.matrix_id = mp.id
+JOIN materials m ON m.id = mpd.material_id
+LEFT JOIN log_keluar_harian lk ON lk.unit_id = pu.unit_id
+    AND lk.material_id = mpd.material_id
+GROUP BY
+    pu.unit_id,
+    u.nama_unit,
+    pu.progress_percent,
+    mp.tahap_pekerjaan,
+    mpd.material_id,
+    m.nama_material,
+    mpd.qty_standar,
+    mpd.batas_warning,
+    mpd.batas_boros;
+SQL;
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_14_083950_add_status_material_to_progress_unit_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        // Guard: kolom sudah ada di CREATE TABLE migration yang diperbaiki,
+        // jadi skip jika sudah ada (penting untuk RefreshDatabase di test).
+        if (Schema::hasColumn('progress_unit', 'status_material')) {
+            return;
+        }
+
+        Schema::table('progress_unit', function (Blueprint $table) {
+            $table->string('status_material')->nullable()->after('status');
+            $table->json('detail_material')->nullable()->after('status_material');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('progress_unit', function (Blueprint $table) {
+            $table->dropColumn(['status_material', 'detail_material']);
+        });
+    }
+};
+
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_15_000001_create_log_gudang_histories_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('log_gudang_histories', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
+            $table->string('tipe_log'); // 'masuk' atau 'keluar'
+            $table->unsignedBigInteger('log_id');
+            $table->string('action'); // 'create', 'update', 'delete'
+            $table->json('data_lama')->nullable();
+            $table->json('data_baru')->nullable();
+            $table->timestamps();
+
+            $table->index(['tipe_log', 'log_id']);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('log_gudang_histories');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_17_000001_add_soft_deletes_to_log_gudang_tables.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('log_masuk_gudang', function (Blueprint $table) {
+            $table->softDeletes();
+        });
+
+        Schema::table('log_keluar_harian', function (Blueprint $table) {
+            $table->softDeletes();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('log_masuk_gudang', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
+
+        Schema::table('log_keluar_harian', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_17_082033_create_activity_logs_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('activity_logs', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('module', 30);      // 'unit', 'progress', 'material_status', dst
+            $table->string('action', 20);      // 'create', 'update', 'delete', 'warning', 'boros'
+            $table->string('description', 255);
+            $table->string('subject_type', 100)->nullable();
+            $table->unsignedBigInteger('subject_id')->nullable();
+            $table->timestamp('read_at')->nullable();
+            $table->timestamps();
+
+            $table->index(['module', 'created_at']);
+            $table->index('read_at');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('activity_logs');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_21_035000_create_akun_referensis_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        if (Schema::hasTable('akun_referensis')) {
+            return;
+        }
+
+        Schema::create('akun_referensis', function (Blueprint $table) {
+            $table->id();
+            $table->string('kode_akun', 20)->unique();
+            $table->string('nama_akun', 255);
+            $table->string('kategori', 50);
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('akun_referensis');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_21_040000_add_actor_columns_to_akun_referensis_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        if (!Schema::hasTable('akun_referensis')) {
+            return;
+        }
+
+        Schema::table('akun_referensis', function (Blueprint $table) {
+            if (!Schema::hasColumn('akun_referensis', 'created_by')) {
+                $table->foreignId('created_by')->nullable()->after('kategori')
+                    ->constrained('users')->nullOnDelete();
+            }
+            if (!Schema::hasColumn('akun_referensis', 'updated_by')) {
+                $table->foreignId('updated_by')->nullable()->after('created_by')
+                    ->constrained('users')->nullOnDelete();
+            }
+            if (!Schema::hasColumn('akun_referensis', 'deleted_by')) {
+                $table->foreignId('deleted_by')->nullable()->after('updated_by')
+                    ->constrained('users')->nullOnDelete();
+            }
+            if (!Schema::hasColumn('akun_referensis', 'deleted_at')) {
+                $table->softDeletes();
+            }
+        });
+    }
+
+    public function down(): void
+    {
+        if (!Schema::hasTable('akun_referensis')) {
+            return;
+        }
+
+        Schema::table('akun_referensis', function (Blueprint $table) {
+            if (Schema::hasColumn('akun_referensis', 'created_by')) {
+                $table->dropConstrainedForeignId('created_by');
+            }
+            if (Schema::hasColumn('akun_referensis', 'updated_by')) {
+                $table->dropConstrainedForeignId('updated_by');
+            }
+            if (Schema::hasColumn('akun_referensis', 'deleted_by')) {
+                $table->dropConstrainedForeignId('deleted_by');
+            }
+            if (Schema::hasColumn('akun_referensis', 'deleted_at')) {
+                $table->dropSoftDeletes();
+            }
+        });
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_21_040629_create_kas_masuks_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        if (Schema::hasTable('kas_masuks')) {
+            return;
+        }
+
+        Schema::create('kas_masuks', function (Blueprint $table) {
+            $table->id();
+            $table->date('tanggal');
+            $table->foreignId('akun_referensi_id')->constrained('akun_referensis');
+            $table->text('keterangan')->nullable();
+            $table->decimal('nominal', 15, 2);
+            $table->string('dari');
+            $table->string('untuk')->default('Kas Proyek SiteFlow');
+            $table->unsignedTinyInteger('minggu_ke')->nullable();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('kas_masuks');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_21_042628_create_kas_keluars_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        if (Schema::hasTable('kas_keluars')) {
+            return;
+        }
+
+        Schema::create('kas_keluars', function (Blueprint $table) {
+            $table->id();
+            $table->date('tanggal');
+            $table->foreignId('akun_referensi_id')->constrained('akun_referensis');
+            $table->string('unit')->nullable(); // teks bebas: "A1", "Infrastruktur", dll
+            $table->text('keterangan')->nullable();
+            $table->decimal('qty', 12, 2)->default(1);
+            $table->string('satuan')->nullable();
+            $table->decimal('nominal_per_unit', 15, 2);
+            $table->decimal('total', 15, 2); // qty * nominal_per_unit, dihitung di service
+            $table->enum('metode_bayar', ['transfer', 'tunai'])->default('transfer');
+            $table->string('penerima')->nullable();
+            $table->string('lampiran_path')->nullable();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('kas_keluars');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_21_044149_create_akun_referensi_histories_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        if (Schema::hasTable('akun_referensi_histories')) {
+            return;
+        }
+
+        Schema::create('akun_referensi_histories', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('akun_referensi_id')->constrained('akun_referensis')->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->enum('aksi', ['ditambahkan', 'diedit', 'dihapus']);
+            $table->json('detail')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('akun_referensi_histories');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_21_045000_add_jenis_to_akun_referensis_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        if (!Schema::hasTable('akun_referensis')) {
+            return;
+        }
+
+        Schema::table('akun_referensis', function (Blueprint $table) {
+            if (!Schema::hasColumn('akun_referensis', 'jenis')) {
+                $table->enum('jenis', ['masuk', 'keluar'])->default('masuk')->after('kategori');
+            }
+        });
+    }
+
+    public function down(): void
+    {
+        if (!Schema::hasTable('akun_referensis')) {
+            return;
+        }
+
+        Schema::table('akun_referensis', function (Blueprint $table) {
+            if (Schema::hasColumn('akun_referensis', 'jenis')) {
+                $table->dropColumn('jenis');
+            }
+        });
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_23_000000_fix_akun_referensis_missing_columns.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        if (!Schema::hasTable('akun_referensis')) {
+            return;
+        }
+
+        Schema::table('akun_referensis', function (Blueprint $table) {
+            if (!Schema::hasColumn('akun_referensis', 'deleted_at')) {
+                $table->softDeletes();
+            }
+
+            if (!Schema::hasColumn('akun_referensis', 'created_by')) {
+                $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            }
+
+            if (!Schema::hasColumn('akun_referensis', 'updated_by')) {
+                $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            }
+
+            if (!Schema::hasColumn('akun_referensis', 'deleted_by')) {
+                $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+            }
+
+            if (!Schema::hasColumn('akun_referensis', 'jenis')) {
+                $table->enum('jenis', ['masuk', 'keluar'])->default('masuk');
+            }
+        });
+    }
+
+    public function down(): void
+    {
+        if (!Schema::hasTable('akun_referensis')) {
+            return;
+        }
+
+        Schema::table('akun_referensis', function (Blueprint $table) {
+            if (Schema::hasColumn('akun_referensis', 'deleted_by')) {
+                $table->dropConstrainedForeignId('deleted_by');
+            }
+            if (Schema::hasColumn('akun_referensis', 'updated_by')) {
+                $table->dropConstrainedForeignId('updated_by');
+            }
+            if (Schema::hasColumn('akun_referensis', 'created_by')) {
+                $table->dropConstrainedForeignId('created_by');
+            }
+            if (Schema::hasColumn('akun_referensis', 'deleted_at')) {
+                $table->dropSoftDeletes();
+            }
+            if (Schema::hasColumn('akun_referensis', 'jenis')) {
+                $table->dropColumn('jenis');
+            }
+        });
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_23_100000_create_user_menu_overrides_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('user_menu_overrides', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            // menu_key = route name dari menu, contoh: 'unit.index', 'gudang.index', 'finance.kas-masuk'
+            $table->string('menu_key');
+            // visible = true  â†’ paksa tampilkan meskipun role tidak include menu ini
+            // visible = false â†’ paksa sembunyikan meskipun role include menu ini
+            $table->boolean('visible');
+            $table->timestamps();
+
+            $table->unique(['user_id', 'menu_key']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('user_menu_overrides');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_24_082046_create_password_reset_tokens_table.php
+---
+<?php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('password_reset_tokens', function (Blueprint $table) {
+            $table->string('email')->primary();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('password_reset_tokens');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_27_000000_add_parent_id_to_akun_referensis_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        if (!Schema::hasTable('akun_referensis')) {
+            return;
+        }
+
+        Schema::table('akun_referensis', function (Blueprint $table) {
+            if (!Schema::hasColumn('akun_referensis', 'parent_id')) {
+                $table->foreignId('parent_id')->nullable()->after('id')->constrained('akun_referensis')->nullOnDelete();
+            }
+        });
+    }
+
+    public function down(): void
+    {
+        if (!Schema::hasTable('akun_referensis')) {
+            return;
+        }
+
+        Schema::table('akun_referensis', function (Blueprint $table) {
+            if (Schema::hasColumn('akun_referensis', 'parent_id')) {
+                $table->dropColumn('parent_id');
+            }
+        });
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_27_000000_add_tipe_neraca_to_akun_referensis_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        if (!Schema::hasTable('akun_referensis')) {
+            return;
+        }
+
+        Schema::table('akun_referensis', function (Blueprint $table) {
+            if (!Schema::hasColumn('akun_referensis', 'tipe_neraca')) {
+                // modal            = setoran modal owner (nambah Modal langsung)
+                // pendapatan       = termin klien, penjualan unit, dll (nambah Laba/Rugi Berjalan)
+                // beban            = upah, sewa alat, operasional (ngurangin Laba/Rugi Berjalan)
+                // pembelian_aset   = beli material: uang -> persediaan, TIDAK dianggap beban
+                $table->enum('tipe_neraca', ['modal', 'pendapatan', 'beban', 'pembelian_aset'])
+                    ->default('beban')
+                    ->after('kategori');
+            }
+        });
+    }
+
+    public function down(): void
+    {
+        if (!Schema::hasTable('akun_referensis')) {
+            return;
+        }
+
+        Schema::table('akun_referensis', function (Blueprint $table) {
+            if (Schema::hasColumn('akun_referensis', 'tipe_neraca')) {
+                $table->dropColumn('tipe_neraca');
+            }
+        });
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_27_000001_create_journal_entries_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('journal_entries', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('account_id');
+            $table->decimal('debit', 15, 2)->default(0);
+            $table->decimal('credit', 15, 2)->default(0);
+            $table->date('tanggal');
+            $table->string('keterangan')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('journal_entries');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_27_064953_add_tipe_akun_to_akun_referensis_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('akun_referensis', function (Blueprint $table) {
+            $table->enum('tipe_akun', ['induk', 'sub'])->default('induk')->after('kategori');
+        });
+
+        // Backfill data lama: akun yang sudah punya parent_id dianggap 'sub',
+        // sisanya dianggap 'induk'.
+        DB::table('akun_referensis')->whereNotNull('parent_id')->update(['tipe_akun' => 'sub']);
+    }
+
+    public function down(): void
+    {
+        Schema::table('akun_referensis', function (Blueprint $table) {
+            $table->dropColumn('tipe_akun');
+        });
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_07_27_095702_fix_tipe_neraca_add_liabilitas.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
+        DB::statement("ALTER TABLE akun_referensis DROP CONSTRAINT akun_referensis_tipe_neraca_check");
+        DB::statement("ALTER TABLE akun_referensis ADD CONSTRAINT akun_referensis_tipe_neraca_check CHECK (tipe_neraca IN ('modal','pendapatan','beban','pembelian_aset','liabilitas'))");
+    }
+
+    public function down(): void
+    {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
+        DB::statement("ALTER TABLE akun_referensis DROP CONSTRAINT akun_referensis_tipe_neraca_check");
+        DB::statement("ALTER TABLE akun_referensis ADD CONSTRAINT akun_referensis_tipe_neraca_check CHECK (tipe_neraca IN ('modal','pendapatan','beban','pembelian_aset'))");
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_08_01_000000_add_satuan_to_log_keluar_harian_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('log_keluar_harian', function (Blueprint $table) {
+            $table->string('satuan', 20)->nullable()->after('qty');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('log_keluar_harian', function (Blueprint $table) {
+            $table->dropColumn('satuan');
+        });
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_08_03_060925_create_master_standar_progress_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('master_standar_progress', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama_standar');
+            $table->text('deskripsi')->nullable();
+            $table->timestamps();
+        });
+
+        // Insert default standar
+        $defaultId = DB::table('master_standar_progress')->insertGetId([
+            'nama_standar' => 'Standar Default (Lama)',
+            'deskripsi' => 'Standar progress awal sistem sebelum ada fitur multi-standar.',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        Schema::table('matrix_progress', function (Blueprint $table) use ($defaultId) {
+            $table->foreignId('master_standar_id')->default($defaultId)->after('id')
+                  ->constrained('master_standar_progress')->cascadeOnUpdate()->restrictOnDelete();
+        });
+
+        Schema::table('units', function (Blueprint $table) use ($defaultId) {
+            $table->foreignId('master_standar_id')->default($defaultId)->after('keterangan')
+                  ->constrained('master_standar_progress')->cascadeOnUpdate()->restrictOnDelete();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('units', function (Blueprint $table) {
+            $table->dropForeign(['master_standar_id']);
+            $table->dropColumn('master_standar_id');
+        });
+
+        Schema::table('matrix_progress', function (Blueprint $table) {
+            $table->dropForeign(['master_standar_id']);
+            $table->dropColumn('master_standar_id');
+        });
+
+        Schema::dropIfExists('master_standar_progress');
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_08_03_061423_update_monitoring_view_for_master_standar.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        DB::statement("DROP VIEW IF EXISTS v_monitoring_progress;");
+
+        DB::statement("
+            CREATE VIEW v_monitoring_progress AS
+
+            SELECT
+                pu.unit_id,
+                u.nama_unit,
+                pu.progress_percent,
+                mp.tahap_pekerjaan,
+                mpd.material_id,
+                m.nama_material,
+                mpd.qty_standar AS standar,
+                COALESCE(SUM(lk.qty),0) AS aktual,
+                CASE
+                    WHEN COALESCE(SUM(lk.qty),0) > mpd.qty_standar * mpd.batas_boros THEN 'BOROS'
+                    WHEN COALESCE(SUM(lk.qty),0) > mpd.qty_standar * mpd.batas_warning THEN 'WARNING'
+                    ELSE 'AMAN'
+                END AS analisa
+
+            FROM progress_unit pu
+
+            JOIN units u
+                ON u.id = pu.unit_id
+
+            JOIN matrix_progress mp
+                ON mp.master_standar_id = u.master_standar_id
+                AND mp.batas_atas = (
+                    SELECT MIN(batas_atas)
+                    FROM matrix_progress
+                    WHERE batas_atas >= pu.progress_percent
+                      AND master_standar_id = u.master_standar_id
+                )
+
+            JOIN matrix_progress_detail mpd
+                ON mpd.matrix_id = mp.id
+
+            JOIN materials m
+                ON m.id = mpd.material_id
+
+            LEFT JOIN log_keluar_harian lk
+                ON lk.unit_id = pu.unit_id
+                AND lk.material_id = mpd.material_id
+
+            GROUP BY
+                pu.unit_id,
+                u.nama_unit,
+                pu.progress_percent,
+                mp.tahap_pekerjaan,
+                mpd.material_id,
+                m.nama_material,
+                mpd.qty_standar,
+                mpd.batas_warning,
+                mpd.batas_boros
+        ");
+    }
+
+    public function down(): void
+    {
+        DB::statement("DROP VIEW IF EXISTS v_monitoring_progress;");
+
+        DB::statement("
+            CREATE VIEW v_monitoring_progress AS
+
+            SELECT
+                pu.unit_id,
+                u.nama_unit,
+                pu.progress_percent,
+                mp.tahap_pekerjaan,
+                mpd.material_id,
+                m.nama_material,
+                mpd.qty_standar AS standar,
+                COALESCE(SUM(lk.qty),0) AS aktual,
+                CASE
+                    WHEN COALESCE(SUM(lk.qty),0) > mpd.qty_standar * mpd.batas_boros THEN 'BOROS'
+                    WHEN COALESCE(SUM(lk.qty),0) > mpd.qty_standar * mpd.batas_warning THEN 'WARNING'
+                    ELSE 'AMAN'
+                END AS analisa
+
+            FROM progress_unit pu
+
+            JOIN units u ON u.id = pu.unit_id
+
+            JOIN matrix_progress mp
+                ON mp.batas_atas = (
+                    SELECT MIN(batas_atas)
+                    FROM matrix_progress
+                    WHERE batas_atas >= pu.progress_percent
+                )
+
+            JOIN matrix_progress_detail mpd ON mpd.matrix_id = mp.id
+            JOIN materials m ON m.id = mpd.material_id
+
+            LEFT JOIN log_keluar_harian lk
+                ON lk.unit_id = pu.unit_id
+                AND lk.material_id = mpd.material_id
+
+            GROUP BY
+                pu.unit_id, u.nama_unit, pu.progress_percent,
+                mp.tahap_pekerjaan, mpd.material_id, m.nama_material,
+                mpd.qty_standar, mpd.batas_warning, mpd.batas_boros
+        ");
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_08_03_063423_change_unique_constraint_on_matrix_progress_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('matrix_progress', function (Blueprint $table) {
+            // Drop unique batas_atas
+            $table->dropUnique('matrix_progress_batas_atas_unique');
+            
+            // Add unique composite (master_standar_id, batas_atas)
+            $table->unique(['master_standar_id', 'batas_atas'], 'matrix_progress_master_batas_unique');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('matrix_progress', function (Blueprint $table) {
+            $table->dropUnique('matrix_progress_master_batas_unique');
+            $table->unique('batas_atas', 'matrix_progress_batas_atas_unique');
+        });
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_08_03_064212_add_soft_deletes_to_matrix_progress_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('matrix_progress', function (Blueprint $table) {
+            $table->softDeletes();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('matrix_progress', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_08_03_064301_add_soft_deletes_to_matrix_progress_detail_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('matrix_progress_detail', function (Blueprint $table) {
+            $table->softDeletes();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('matrix_progress_detail', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_08_03_064938_fix_unique_constraint_with_soft_deletes_on_matrix_progress.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        // Drop the old unique constraint that doesn't respect soft deletes
+        Schema::table('matrix_progress', function (Blueprint $table) {
+            $table->dropUnique('matrix_progress_master_batas_unique');
+        });
+
+        // Create a partial unique index that only applies to non-deleted rows
+        DB::statement('
+            CREATE UNIQUE INDEX matrix_progress_master_batas_unique
+            ON matrix_progress (master_standar_id, batas_atas)
+            WHERE deleted_at IS NULL
+        ');
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        // Drop the partial unique index
+        DB::statement('DROP INDEX IF EXISTS matrix_progress_master_batas_unique');
+
+        // Restore the original unique constraint
+        Schema::table('matrix_progress', function (Blueprint $table) {
+            $table->unique(['master_standar_id', 'batas_atas'], 'matrix_progress_master_batas_unique');
+        });
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\2026_08_05_044625_update_aksi_check_constraint_on_akun_referensi_histories_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        DB::statement('ALTER TABLE akun_referensi_histories DROP CONSTRAINT akun_referensi_histories_aksi_check');
+        DB::statement("ALTER TABLE akun_referensi_histories ADD CONSTRAINT akun_referensi_histories_aksi_check CHECK (aksi IN ('ditambahkan', 'diedit', 'dihapus', 'dipulihkan'))");
+    }
+
+    public function down(): void
+    {
+        DB::statement('ALTER TABLE akun_referensi_histories DROP CONSTRAINT akun_referensi_histories_aksi_check');
+        DB::statement("ALTER TABLE akun_referensi_histories ADD CONSTRAINT akun_referensi_histories_aksi_check CHECK (aksi IN ('ditambahkan', 'diedit', 'dihapus'))");
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\database\migrations\database\migrations\2026_07_29_000000_add_material_purchase_link_to_kas_keluars_table.php
+---
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('kas_keluars', function (Blueprint $table) {
+            $table->boolean('is_pembelian_material')->default(false)->after('metode_bayar');
+            $table->foreignId('material_id')->nullable()->after('is_pembelian_material')
+                ->constrained('materials')->nullOnDelete();
+        });
+
+        Schema::table('log_masuk_gudang', function (Blueprint $table) {
+            $table->foreignId('kas_keluar_id')->nullable()->after('created_by')
+                ->constrained('kas_keluars')->nullOnDelete();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('log_masuk_gudang', function (Blueprint $table) {
+            $table->dropConstrainedForeignId('kas_keluar_id');
+        });
+
+        Schema::table('kas_keluars', function (Blueprint $table) {
+            $table->dropConstrainedForeignId('material_id');
+            $table->dropColumn('is_pembelian_material');
+        });
+    }
+};
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\app\Models\ActivityLog.php
+---
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class ActivityLog extends Model
+{
+    protected $fillable = [
+        'user_id', 'module', 'action', 'description',
+        'subject_type', 'subject_id', 'read_at',
+    ];
+
+    protected $casts = [
+        'read_at' => 'datetime',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+}
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\app\Models\AkunReferensi.php
+---
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\KasKeluar;
+use App\Models\KasMasuk;
+
+class AkunReferensi extends Model
+{
+    use SoftDeletes;
+
+    protected $fillable = [
+        'kode_akun',
+        'nama_akun',
+        'kategori',
+        'jenis',
+        'tipe_akun',
+        'parent_id',
+        'tipe_neraca',
+        'created_by',
+        'updated_by',
+        'deleted_by',
+    ];
+
+    protected $casts = [
+        'deleted_at' => 'datetime',
+    ];
+
+    /**
+     * Tipe neraca yang mewakili aliran dana MASUK (kas_masuks).
+     * Selain yang ada di daftar ini, dianggap KELUAR (kas_keluars).
+     *
+     * Ini menentukan otomatis field `jenis`, supaya user tidak perlu
+     * memilihnya manual dan tidak mungkin salah/tidak konsisten dengan
+     * tipe_neraca-nya sendiri.
+     */
+    public const TIPE_NERACA_MASUK = ['modal', 'pendapatan', 'liabilitas'];
+
+    protected static function booted()
+    {
+        static::saving(function (AkunReferensi $akun) {
+            $akun->jenis = in_array($akun->tipe_neraca, self::TIPE_NERACA_MASUK, true)
+                ? 'masuk'
+                : 'keluar';
+        });
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updater()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function deleter()
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
+    }
+
+    public function histories()
+    {
+        return $this->hasMany(AkunReferensiHistory::class)->latest();
+    }
+
+    public function kasMasuks()
+    {
+        return $this->hasMany(KasMasuk::class, 'akun_referensi_id');
+    }
+
+    public function kasKeluars()
+    {
+        return $this->hasMany(KasKeluar::class, 'akun_referensi_id');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(AkunReferensi::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(AkunReferensi::class, 'parent_id')->orderBy('kode_akun');
+    }
+
+    public function scopeMasuk($query)
+    {
+        return $query->where('jenis', 'masuk');
+    }
+
+    public function scopeKeluar($query)
+    {
+        return $query->where('jenis', 'keluar');
+    }
+}
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\app\Models\AkunReferensiHistory.php
+---
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class AkunReferensiHistory extends Model
+{
+    protected $fillable = [
+        'akun_referensi_id',
+        'user_id',
+        'aksi',
+        'detail',
+    ];
+
+    protected $casts = [
+        'detail' => 'array',
+    ];
+
+    public function akunReferensi()
+    {
+        return $this->belongsTo(AkunReferensi::class)->withTrashed();
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+}
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\app\Models\JournalEntry.php
+---
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class JournalEntry extends Model
+{
+    use HasFactory;
+
+    protected $table = 'journal_entries';
+
+    protected $fillable = [
+        'account_id',
+        'debit',
+        'credit',
+        'tanggal',
+        'keterangan',
+    ];
+
+    public function account()
+    {
+        return $this->belongsTo(AkunReferensi::class, 'account_id');
+    }
+}
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\app\Models\KasKeluar.php
+---
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class KasKeluar extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'tanggal',
+        'akun_referensi_id',
+        'unit',
+        'keterangan',
+        'qty',
+        'satuan',
+        'nominal_per_unit',
+        'total',
+        'metode_bayar',
+        'penerima',
+        'lampiran_path',
+        'is_pembelian_material',
+        'material_id',
+        'created_by',
+    ];
+
+    protected $casts = [
+        'tanggal' => 'date',
+        'qty' => 'decimal:2',
+        'nominal_per_unit' => 'decimal:2',
+        'total' => 'decimal:2',
+        'is_pembelian_material' => 'boolean',
+    ];
+
+    public function akunReferensi()
+    {
+        return $this->belongsTo(AkunReferensi::class);
+    }
+
+    public function material()
+    {
+        return $this->belongsTo(Material::class);
+    }
+
+    public function logMasukGudang()
+    {
+        return $this->hasOne(LogMasukGudang::class, 'kas_keluar_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function getLampiranUrlAttribute(): ?string
+    {
+        return $this->lampiran_path ? asset('storage/' . $this->lampiran_path) : null;
+    }
+}
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\app\Models\KasMasuk.php
+---
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class KasMasuk extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'tanggal',
+        'akun_referensi_id',
+        'keterangan',
+        'nominal',
+        'dari',
+        'untuk',
+        'minggu_ke',
+        'created_by',
+    ];
+
+    protected $casts = [
+        'tanggal' => 'date',
+        'nominal' => 'decimal:2',
+    ];
+
+    public function akunReferensi()
+    {
+        return $this->belongsTo(AkunReferensi::class);
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+}
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\app\Models\LogGudangHistory.php
+---
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class LogGudangHistory extends Model
+{
+    protected $table = 'log_gudang_histories';
+
+    protected $fillable = [
+        'user_id',
+        'tipe_log',
+        'log_id',
+        'action',
+        'data_lama',
+        'data_baru',
+    ];
+
+    protected $casts = [
+        'data_lama' => 'array',
+        'data_baru' => 'array',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+}
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\app\Models\LogKeluarHarian.php
+---
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\LogGudangHistory;
+
+class LogKeluarHarian extends Model
+{
+    use SoftDeletes;
+
+    protected $table = 'log_keluar_harian';
+
+    protected $fillable = [
+        'tanggal', 'unit_id', 'material_id', 'qty',
+        'harga', 'total', 'keterangan', 'created_by', 'satuan',
+    ];
+
+    protected $casts = [
+        'tanggal' => 'date',
+        'deleted_at' => 'datetime',
+    ];
+
+    public function histories()
+    {
+        return $this->hasMany(LogGudangHistory::class, 'log_id')
+            ->where('tipe_log', 'keluar')
+            ->latest('created_at');
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($model) {
+            LogGudangHistory::create([
+                'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                'tipe_log' => 'keluar',
+                'log_id' => $model->id,
+                'action' => 'create',
+                'data_baru' => $model->toArray(),
+            ]);
+        });
+
+        static::updating(function ($model) {
+            LogGudangHistory::create([
+                'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                'tipe_log' => 'keluar',
+                'log_id' => $model->id,
+                'action' => 'update',
+                'data_lama' => $model->getOriginal(),
+                'data_baru' => $model->getAttributes(),
+            ]);
+        });
+
+        static::deleted(function ($model) {
+            LogGudangHistory::create([
+                'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                'tipe_log' => 'keluar',
+                'log_id' => $model->id,
+                'action' => 'delete',
+                'data_lama' => $model->toArray(),
+            ]);
+        });
+    }
+
+    public function material()
+    {
+        return $this->belongsTo(Material::class);
+    }
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+}
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\app\Models\LogMasukGudang.php
+---
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\LogGudangHistory;
+
+class LogMasukGudang extends Model
+{
+    use SoftDeletes;
+
+    protected $table = 'log_masuk_gudang';
+
+    protected $fillable = [
+        'tanggal',
+        'supplier',
+        'material_id',
+        'qty',
+        'harga_satuan',
+        'total_harga',
+        'keterangan',
+        'created_by',
+        'kas_keluar_id',
+    ];
+
+    protected $casts = [
+        'tanggal' => 'date',
+        'qty' => 'decimal:2',
+        'harga_satuan' => 'decimal:2',
+        'total_harga' => 'decimal:2',
+        'deleted_at' => 'datetime',
+    ];
+
+    public function histories()
+    {
+        return $this->hasMany(LogGudangHistory::class, 'log_id')
+            ->where('tipe_log', 'masuk')
+            ->latest('created_at');
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($model) {
+            LogGudangHistory::create([
+                'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                'tipe_log' => 'masuk',
+                'log_id' => $model->id,
+                'action' => 'create',
+                'data_baru' => $model->toArray(),
+            ]);
+        });
+
+        static::updating(function ($model) {
+            LogGudangHistory::create([
+                'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                'tipe_log' => 'masuk',
+                'log_id' => $model->id,
+                'action' => 'update',
+                'data_lama' => $model->getOriginal(),
+                'data_baru' => $model->getAttributes(),
+            ]);
+        });
+
+        static::deleted(function ($model) {
+            LogGudangHistory::create([
+                'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                'tipe_log' => 'masuk',
+                'log_id' => $model->id,
+                'action' => 'delete',
+                'data_lama' => $model->toArray(),
+            ]);
+        });
+    }
+
+    public function material()
+    {
+
+        return $this->belongsTo(Material::class);
+    }
+    public function kasKeluar()
+{
+    return $this->belongsTo(KasKeluar::class);
+}
+}
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\app\Models\MasterAkun.php
+---
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class MasterAkun extends Model
+{
+    protected $table = 'master_akun';
+
+    protected $fillable = [
+        'kode_akun',
+        'nama_akun',
+        'kategori',
+    ];
+
+    public function kasMasuk()
+    {
+        return $this->hasMany(KasMasuk::class, 'akun_id');
+    }
+
+    public function kasKeluar()
+    {
+        return $this->hasMany(KasKeluar::class, 'akun_id');
+    }
+}
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\app\Models\MasterStandarProgress.php
+---
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class MasterStandarProgress extends Model
+{
+    protected $table = 'master_standar_progress';
+
+    protected $fillable = [
+        'nama_standar',
+        'deskripsi',
+    ];
+
+    public function matrixProgress()
+    {
+        return $this->hasMany(MatrixProgress::class, 'master_standar_id');
+    }
+
+    public function units()
+    {
+        return $this->hasMany(Unit::class, 'master_standar_id');
+    }
+}
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\app\Models\Material.php
+---
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class Material extends Model
+{
+    protected $fillable = [
+        'kode_material', 'nama_material', 'satuan', 'kategori', 'harga',
+    ];
+
+    public function logMasuk()
+    {
+        return $this->hasMany(LogMasukGudang::class);
+    }
+
+    public function logKeluar()
+    {
+        return $this->hasMany(LogKeluarHarian::class);
+    }
+
+    public function latestLogMasuk()
+    {
+    return $this->hasOne(\App\Models\LogMasukGudang::class)
+    ->latestOfMany(['tanggal', 'id']);
+    }
+}
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\app\Models\MatrixProgress.php
+---
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class MatrixProgress extends Model
+{
+    use HasFactory, SoftDeletes;
+
+    protected $table = 'matrix_progress';
+
+    protected $fillable = [
+        'tahap_pekerjaan',
+        'master_standar_id',
+        'batas_atas',
+        'range_progress',
+    ];
+
+    public function masterStandar()
+    {
+        return $this->belongsTo(MasterStandarProgress::class, 'master_standar_id');
+    }
+
+    protected $casts = [
+        'batas_atas' => 'integer',
+    ];
+
+ public const MASTER_TAHAP = [
+        ['tahap_pekerjaan' => 'Persiapan + Galian',        'batas_atas' => 5,   'range_progress' => '0-5'],
+        ['tahap_pekerjaan' => 'Pondasi',                   'batas_atas' => 10,  'range_progress' => '6-10'],
+        ['tahap_pekerjaan' => 'Sloof',                     'batas_atas' => 15,  'range_progress' => '11-15'],
+        ['tahap_pekerjaan' => 'Kolom + Ring Balok',         'batas_atas' => 20,  'range_progress' => '16-20'],
+        ['tahap_pekerjaan' => 'Bata Tahap 1',               'batas_atas' => 25,  'range_progress' => '21-25'],
+        ['tahap_pekerjaan' => 'Bata Tahap 2',               'batas_atas' => 35,  'range_progress' => '26-35'],
+        ['tahap_pekerjaan' => 'Struktur Atas + Atap',       'batas_atas' => 45,  'range_progress' => '36-45'],
+        ['tahap_pekerjaan' => 'Kuda-kuda + Penutup Atap',   'batas_atas' => 55,  'range_progress' => '46-55'],
+        ['tahap_pekerjaan' => 'Plesteran',                  'batas_atas' => 65,  'range_progress' => '56-65'],
+        ['tahap_pekerjaan' => 'Acian',                      'batas_atas' => 75,  'range_progress' => '66-75'],
+        ['tahap_pekerjaan' => 'Keramik + Plumbing',         'batas_atas' => 85,  'range_progress' => '76-85'],
+        ['tahap_pekerjaan' => 'Pengecatan + Instalasi',     'batas_atas' => 95,  'range_progress' => '86-95'],
+        ['tahap_pekerjaan' => 'Finishing',                  'batas_atas' => 100, 'range_progress' => '96-100'],
+    ];
+    public static function findMaster(string $tahapPekerjaan): ?array
+    {
+        foreach (self::MASTER_TAHAP as $item) {
+            if ($item['tahap_pekerjaan'] === $tahapPekerjaan) {
+                return $item;
+            }
+        }
+        return null;
+    }
+    protected static function booted()
+    {
+        static::saving(function ($matrix) {
+            // Gunakan batas_atas dari input jika ada
+            if ($matrix->batas_atas) {
+                // Hitung batas bawah: cari batas_atas terdekat yang lebih kecil di standar yang sama
+                $prevBatas = static::where('master_standar_id', $matrix->master_standar_id)
+                    ->where('batas_atas', '<', $matrix->batas_atas)
+                    ->when($matrix->id, fn($q) => $q->where('id', '!=', $matrix->id))
+                    ->max('batas_atas');
+                $batasBawah = $prevBatas ? $prevBatas + 1 : 0;
+                $matrix->range_progress = "{$batasBawah}-{$matrix->batas_atas}";
+            } else {
+                // Fallback ke MASTER_TAHAP jika batas_atas kosong (seharusnya tidak terjadi karena required)
+                $master = self::findMaster($matrix->tahap_pekerjaan);
+                if ($master) {
+                    $matrix->batas_atas     = $master['batas_atas'];
+                    $matrix->range_progress = $master['range_progress'];
+                }
+            }
+        });
+    }
+
+    public function details()
+    {
+        return $this->hasMany(MatrixProgressDetail::class, 'matrix_id');
+    }
+    public function scopeUrut($query)
+    {
+        return $query->orderBy('batas_atas');
+    }
+}
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\app\Models\MatrixProgressDetail.php
+---
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class MatrixProgressDetail extends Model
+{
+    use HasFactory, SoftDeletes;
+
+    protected $table = 'matrix_progress_detail';
+
+    protected $fillable = [
+        'matrix_id',
+        'material_id',
+        'qty_standar',
+    ];
+
+    protected $casts = [
+        'qty_standar' => 'decimal:2',
+    ];
+
+    public function matrix()
+    {
+        return $this->belongsTo(MatrixProgress::class, 'matrix_id');
+    }
+
+    public function material()
+    {
+        return $this->belongsTo(Material::class, 'material_id');
+    }
+}
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\app\Models\OtpCode.php
+---
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class OtpCode extends Model
+{
+    protected $fillable = [
+        'email', 'otp', 'purpose', 'payload', 'expires_at', 'verified_at',
+    ];
+
+    protected $casts = [
+        'payload' => 'array',
+        'expires_at' => 'datetime',
+        'verified_at' => 'datetime',
+    ];
+
+    public function isExpired(): bool
+    {
+        return $this->expires_at->isPast();
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->verified_at !== null;
+    }
+}
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\app\Models\ProgressUnit.php
+---
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class ProgressUnit extends Model
+{
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    protected $table = 'progress_unit';
+
+    protected $fillable = [
+        'unit_id', 'progress_percent', 'tanggal_update', 'status', 'updated_by',
+        'status_material', 'detail_material',
+    ];
+
+    protected $casts = [
+    'tanggal_update' => 'date:Y-m-d',
+    'detail_material' => 'array',
+    ];
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class, 'unit_id');
+    }
+}
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\app\Models\Unit.php
+---
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Unit extends Model
+{
+    use HasFactory;
+
+    protected $table = 'units';
+
+    protected $fillable = [
+        'nama_unit', 'zona', 'status', 'tukang', 'tanggal_mulai', 'keterangan', 'master_standar_id'
+    ];
+
+    public function masterStandar()
+    {
+        return $this->belongsTo(MasterStandarProgress::class, 'master_standar_id');
+    }
+
+    protected $casts = [
+        'tanggal_mulai' => 'date',
+    ];
+
+    public function setNamaUnitAttribute($value): void
+    {
+        $this->attributes['nama_unit'] = $this->normalizeCode($value, 4);
+    }
+
+    public function setZonaAttribute($value): void
+    {
+        $this->attributes['zona'] = $this->normalizeCode($value, 2);
+    }
+
+    public function progress()
+    {
+        return $this->hasMany(ProgressUnit::class, 'unit_id');
+    }
+
+    public function latestProgress()
+    {
+        return $this->hasOne(ProgressUnit::class, 'unit_id')->latestOfMany('id');
+    }
+
+    public function logKeluar()
+    {
+        return $this->hasMany(LogKeluarHarian::class);
+    }
+
+    private function normalizeCode($value, int $length): string
+    {
+        $clean = preg_replace('/[^A-Z0-9]/i', '', (string) $value) ?? '';
+
+        return strtoupper(substr($clean, 0, $length));
+    }
+}
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\app\Models\User.php
+---
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+
+#[Fillable([
+    'name',
+    'username',
+    'email',
+    'password',
+    'is_active',
+    'last_login_at',
+])]
+
+#[Hidden(['password', 'remember_token'])]
+class User extends Authenticatable
+{
+    use HasFactory, Notifiable, HasRoles;
+
+    protected string $guard_name = 'web';
+
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            'is_active' => 'boolean',
+            'last_login_at' => 'datetime',
+        ];
+    }
+
+    protected function username(): Attribute
+    {
+        return Attribute::make(
+            set: fn (string $value) => strtolower($value),
+        );
+    }
+
+    protected function email(): Attribute
+    {
+        return Attribute::make(
+            set: fn (string $value) => strtolower($value),
+        );
+    }
+
+    public function menuOverrides(): HasMany
+    {
+        return $this->hasMany(UserMenuOverride::class);
+    }
+
+    /**
+     * Kembalikan peta override dalam format ['menu_key' => true/false]
+     */
+    public function getMenuOverridesMap(): array
+    {
+        return $this->menuOverrides
+            ->pluck('visible', 'menu_key')
+            ->toArray();
+    }
+}
+---
+C:\Documents\Magang\sistem-kontrol-perumahan\sistem_kontrol_perumahan\app\Models\UserMenuOverride.php
+---
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class UserMenuOverride extends Model
+{
+    protected $fillable = ['user_id', 'menu_key', 'visible'];
+
+    protected function casts(): array
+    {
+        return [
+            'visible' => 'boolean',
+        ];
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+}

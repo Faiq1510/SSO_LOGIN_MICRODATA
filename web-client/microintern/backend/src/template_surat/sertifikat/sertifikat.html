@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sertifikat Kerja Praktik</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --ink: #1c1a17;
+        --gold: #e2a13d;
+        --gold-deep: #c9871f;
+        --paper: #ffffff;
+        --muted: #6f6a61;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Poppins", sans-serif;
+        background: #e9e4d8;
+        color: var(--ink);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 40px;
+        padding: 40px;
+      }
+
+      .page {
+        width: 1123px;
+        height: 794px;
+        background: var(--paper);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+        flex-shrink: 0;
+      }
+
+      /* corner geometric pattern */
+      .corner {
+        position: absolute;
+        width: 220px;
+        height: 220px;
+        z-index: 1;
+        pointer-events: none;
+      }
+      .corner.tl {
+        top: 0;
+        left: 0;
+      }
+      .corner.tl img {
+        object-position: top left;
+      }
+      .corner.br {
+        bottom: 0;
+        right: 0;
+      }
+      .corner.br img {
+        object-position: bottom right;
+      }
+      .corner img,
+      .decoration img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: contain;
+      }
+
+      .decoration {
+        position: absolute;
+        z-index: 1;
+        pointer-events: none;
+      }
+      .decoration.bl {
+        bottom: 0;
+        left: 0;
+        width: 220px;
+        height: 220px;
+      }
+      .decoration.bl img {
+        object-position: bottom left;
+      }
+      .decoration.tr {
+        top: 100px;
+        right: 0;
+        width: 120px;
+        height: auto;
+      }
+      .decoration.tr img {
+        object-position: top right;
+      }
+      .decoration.bl-above {
+        bottom: 180px;
+        left: 0;
+        width: 100px;
+        height: auto;
+      }
+      .decoration.bl-above img {
+        object-position: center left;
+      }
+      .decoration.tr-below {
+        top: 260px;
+        right: 0;
+        width: 100px;
+        height: auto;
+      }
+      .decoration.tr-below img {
+        object-position: center right;
+      }
+
+      .content {
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 50px 90px 40px;
+      }
+
+      .brandmark {
+        position: absolute;
+        top: 16px;
+        right: 24px;
+        z-index: 3;
+      }
+      .brandmark img {
+        height: 78px;
+        width: auto;
+        display: block;
+        filter: invert(1) hue-rotate(180deg);
+      }
+
+      /* Certificate page */
+      .cert-title {
+        font-family: "Playfair Display", serif;
+        font-size: 56px;
+        letter-spacing: 0.14em;
+        color: var(--gold-deep);
+        margin: 90px 0 2px;
+        text-align: center;
+      }
+      .cert-subtitle {
+        font-size: 17px;
+        letter-spacing: 0.32em;
+        color: var(--ink);
+        margin-bottom: 34px;
+        text-align: center;
+        font-weight: 500;
+      }
+      .diberikan {
+        font-size: 13.5px;
+        color: var(--muted);
+        letter-spacing: 0.03em;
+        margin-bottom: 8px;
+      }
+      .recipient {
+        font-family: "Great Vibes", cursive;
+        font-size: 58px;
+        color: var(--gold-deep);
+        margin: 0 0 10px;
+        line-height: 1;
+        text-align: center;
+      }
+      .underline {
+        width: 520px;
+        height: 1px;
+        background: var(--ink);
+        margin-bottom: 8px;
+      }
+      .cert-number {
+        font-size: 14px;
+        color: #000000;
+        letter-spacing: 0.05em;
+        margin-bottom: 18px;
+        text-align: center;
+        font-weight: 500;
+      }
+      .cert-body {
+        text-align: center;
+        font-size: 14.5px;
+        line-height: 1.9;
+        color: #2b2822;
+        max-width: 760px;
+        letter-spacing: 0.01em;
+      }
+
+      .signature-block {
+        margin-top: auto;
+        margin-bottom: 56px;
+        text-align: center;
+      }
+      .sign-image {
+        height: 80px;
+        width: auto;
+        margin-bottom: 4px;
+      }
+      .sign-title {
+        margin-bottom: 6px;
+        font-size: 11.5px;
+        letter-spacing: 0.14em;
+        color: var(--muted);
+        text-transform: uppercase;
+      }
+
+      /* Transcript pages */
+      .tr-title {
+        font-family: "Playfair Display", serif;
+        font-size: 46px;
+        letter-spacing: 0.1em;
+        color: var(--gold-deep);
+        margin: 20px 0 2px;
+      }
+      .tr-subtitle {
+        font-size: 13.5px;
+        letter-spacing: 0.3em;
+        color: var(--ink);
+        margin-bottom: 6px;
+        font-weight: 500;
+      }
+      .tr-pageflag {
+        font-size: 11px;
+        letter-spacing: 0.15em;
+        color: var(--muted);
+        margin-bottom: 20px;
+        text-transform: uppercase;
+      }
+      .tr-meta {
+        width: 100%;
+        max-width: 680px;
+        margin: 0 auto 20px;
+        border-left: 3px solid var(--gold);
+        padding-left: 18px;
+      }
+      .tr-meta .m-row {
+        display: flex;
+        gap: 8px;
+        font-size: 13px;
+        margin-bottom: 5px;
+      }
+      .tr-meta .m-label {
+        width: 78px;
+        color: var(--ink);
+        font-weight: 500;
+      }
+      .tr-meta .m-value {
+        color: #2b2822;
+      }
+
+      table.score-table {
+        width: 100%;
+        max-width: 680px;
+        border-collapse: collapse;
+        font-size: 13.5px;
+      }
+      table.score-table th {
+        background: var(--gold);
+        color: #1c1a17;
+        text-align: left;
+        padding: 11px 18px;
+        border: 1px solid var(--ink);
+        font-weight: 600;
+      }
+      table.score-table th.center {
+        text-align: center;
+      }
+      table.score-table td {
+        padding: 11px 18px;
+        border: 1px solid var(--ink);
+        color: #2b2822;
+      }
+      table.score-table td.no {
+        width: 56px;
+        text-align: center;
+        color: var(--muted);
+      }
+      table.score-table td.nilai {
+        width: 160px;
+        text-align: center;
+        font-weight: 600;
+      }
+      table.score-table tr.total-row td {
+        background: #faf3e4;
+        font-weight: 700;
+        color: var(--ink);
+      }
+
+      .catatan-box {
+        width: 100%;
+        max-width: 680px;
+        margin-top: 22px;
+      }
+      .catatan-label {
+        font-size: 11.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+      .catatan-text {
+        border: 1px solid var(--ink);
+        border-radius: 4px;
+        padding: 14px 18px;
+        font-size: 13.5px;
+        line-height: 1.7;
+        color: #2b2822;
+        min-height: 70px;
+      }
+
+      .tr-signature {
+        width: 100%;
+        max-width: 680px;
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 24px;
+      }
+
+      @media print {
+        body {
+          background: #fff;
+          padding: 0;
+          gap: 0;
+        }
+        .page {
+          box-shadow: none;
+          page-break-after: always;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- PAGE 1: SERTIFIKAT -->
+    <div class="page">
+      <div class="corner tl">
+        <img src="sertifikat_files/image006.png" alt="corner top left" />
+      </div>
+      <div class="corner br">
+        <img src="sertifikat_files/image007.png" alt="corner bottom right" />
+      </div>
+
+      <div class="decoration bl">
+        <img src="sertifikat_files/image005.png" alt="corner bottom left" />
+      </div>
+      <div class="decoration bl-above">
+        <img src="sertifikat_files/image004.png" alt="decoration left middle" />
+      </div>
+      <div class="decoration tr">
+        <img src="sertifikat_files/image003_decor.png" alt="corner top right below logo" />
+      </div>
+      <div class="decoration tr-below">
+        <img src="sertifikat_files/image012.png" alt="decoration right middle" />
+      </div>
+
+      <div class="brandmark"><img src="sertifikat_files/microdata-logo.webp" alt="logo" /></div>
+
+      <div class="content">
+        <div class="cert-title">SERTIFIKAT</div>
+        <div class="cert-subtitle">K E R J A &nbsp; P R A K T I K</div>
+
+        <div class="diberikan">Diberikan Kepada :</div>
+        <div class="recipient">{{NAMA_PESERTA}}</div>
+        <div class="underline"></div>
+        <div class="cert-number">No. {{NOMOR_SERTIFIKAT}}</div>
+
+        <div class="cert-body">
+          Bahwa yang bersangkutan dari {{INSTITUSI}}<br />telah menyelesaikan kerja praktik di PT. Microdata Indonesia<br />mulai tanggal {{TANGGAL_MASUK}} sampai dengan
+          {{TANGGAL_KELUAR}}
+        </div>
+
+        <div class="signature-block">
+          <div class="sign-title">Pimpinan Perusahaan</div>
+          <img class="sign-image" src="sertifikat_files/image003.png" alt="tanda tangan" />
+        </div>
+      </div>
+    </div>
+
+    {{TRANSCRIPT_PAGES}}
+  </body>
+</html>

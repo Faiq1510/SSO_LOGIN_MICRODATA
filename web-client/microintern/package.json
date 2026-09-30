@@ -1,0 +1,48 @@
+{
+  "name": "microintern",
+  "version": "1.0.0",
+  "description": "Sistem Informasi Manajemen Peserta PKL",
+  "homepage": "https://gitlab.com/subekti/microintern#readme",
+  "bugs": {
+    "url": "https://gitlab.com/subekti/microintern/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/subekti/microintern.git"
+  },
+  "type": "module",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "setup": "pwsh ./setup.ps1",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "minio": "minio server .minio-data --console-address :9001",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\" \"npm run minio\"",
+    "test": "vitest run --config tests/vitest.config.ts",
+    "test:unit": "vitest run --config tests/vitest.config.ts tests/unit",
+    "test:integration": "vitest run --config tests/vitest.config.ts tests/integration",
+    "test:db": "vitest run --config tests/vitest.db.config.ts",
+    "test:repositories": "vitest run --config tests/vitest.db.config.ts tests/repositories",
+    "test:frontend": "cd frontend && npm run test",
+    "test:watch": "vitest --config tests/vitest.config.ts",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.1",
+    "concurrently": "^10.0.3",
+    "tailwindcss": "^4.3.1"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
+    "@types/bcrypt": "^6.0.0",
+    "@types/supertest": "^7.2.1",
+    "bcrypt": "^6.0.0",
+    "jsdom": "^29.1.1",
+    "prettier": "3.8.4",
+    "supertest": "^7.2.2",
+    "vitest": "^4.1.9"
+  }
+}

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ERD Database - Sistem Kontrol Perumahan</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f9fc;
+      color: #1f2937;
+    }
+    
+    .header {
+      position: sticky;
+      top: 0;
+      background: white; 
+      padding: 16px 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      z-index: 100;
+    }
+    
+    h1 {
+      font-size: 24px;
+      margin: 0;
+    }
+    
+    .diagram-container {
+      width: 100%;
+      height: calc(100vh - 70px);
+      overflow: auto;
+      background: white;
+      padding: 20px;
+    }
+    
+    .mermaid {
+      min-height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>ERD Database - Sistem Kontrol Perumahan</h1>
+  </div>
+  
+  <div class="diagram-container">
+    <div class="mermaid">
+erDiagram
+    users {
+        bigint id PK
+        string nama
+        string email
+        timestamp email_verified_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    master_standar_progress {
+        bigint id PK
+        string nama_standar
+        text deskripsi
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    units {
+        bigint id PK
+        string nama_unit
+        string zona
+        string status
+        string tukang
+        date tanggal_mulai
+        text keterangan
+        bigint master_standar_id FK
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    materials {
+        bigint id PK
+        string kode_material
+        string nama_material
+        string satuan
+        string kategori
+        decimal harga
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    matrix_progress {
+        bigint id PK
+        integer batas_atas
+        string range_progress
+        string tahap_pekerjaan
+        bigint master_standar_id FK
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    matrix_progress_detail {
+        bigint id PK
+        bigint matrix_id FK
+        bigint material_id FK
+        decimal qty_standar
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    progress_unit {
+        bigint id PK
+        bigint unit_id FK
+        integer progress_percent
+        date tanggal_update
+        enum status
+        string status_material
+        json detail_material
+        bigint updated_by FK
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    log_masuk_gudang {
+        bigint id PK
+        date tanggal
+        string supplier
+        bigint material_id FK
+        decimal qty
+        decimal harga_satuan
+        decimal total_harga
+        text keterangan
+        bigint created_by FK
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    log_keluar_harian {
+        bigint id PK
+        date tanggal
+        bigint unit_id FK
+        bigint material_id FK
+        decimal qty
+        decimal harga
+        decimal total
+        string satuan
+        text keterangan
+        bigint created_by FK
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    akun_referensis {
+        bigint id PK
+        string kode_akun
+        string nama_akun
+        string kategori
+        bigint parent_id FK
+        string tipe_neraca
+        string tipe_akun
+        string jenis
+        bigint created_by FK
+        bigint updated_by FK
+        bigint deleted_by FK
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at
+    }
+
+    kas_masuks {
+        bigint id PK
+        date tanggal
+        bigint akun_referensi_id FK
+        text keterangan
+        decimal nominal
+        string dari
+        string untuk
+        integer minggu_ke
+        bigint created_by FK
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    kas_keluars {
+        bigint id PK
+        date tanggal
+        bigint akun_referensi_id FK
+        string unit
+        text keterangan
+        decimal qty
+        string satuan
+        decimal nominal_per_unit
+        decimal total
+        enum metode_bayar
+        string penerima
+        string lampiran_path
+        bigint created_by FK
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    journal_entries {
+        bigint id PK
+        bigint account_id
+        decimal debit
+        decimal credit
+        date tanggal
+        string keterangan
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    log_gudang_histories {
+        bigint id PK
+        bigint user_id FK
+        string tipe_log
+        bigint log_id
+        string action
+        json data_lama
+        json data_baru
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    activity_logs {
+        bigint id PK
+        bigint user_id FK
+        string module
+        string action
+        string description
+        string subject_type
+        bigint subject_id
+        timestamp read_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    user_menu_overrides {
+        bigint id PK
+        bigint user_id FK
+        string menu_key
+        boolean is_override
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    users ||--o{ log_masuk_gudang : "membuat"
+    users ||--o{ log_keluar_harian : "membuat"
+    users ||--o{ progress_unit : "mengupdate"
+    users ||--o{ activity_logs : "melakukan"
+    users ||--o{ log_gudang_histories : "melacak"
+    users ||--o{ kas_masuks : "membuat"
+    users ||--o{ kas_keluars : "membuat"
+    users ||--o{ user_menu_overrides : "memiliki"
+
+    master_standar_progress ||--o{ units : "digunakan oleh"
+    master_standar_progress ||--o{ matrix_progress : "digunakan oleh"
+
+    units ||--o{ progress_unit : "memiliki"
+    units ||--o{ log_keluar_harian : "dipakai untuk"
+
+    materials ||--o{ log_masuk_gudang : "dicatat pada"
+    materials ||--o{ log_keluar_harian : "digunakan pada"
+    materials ||--o{ matrix_progress_detail : "menjadi standar"
+
+    matrix_progress ||--o{ matrix_progress_detail : "memiliki detail"
+
+    akun_referensis ||--o{ kas_masuks : "dicatat pada"
+    akun_referensis ||--o{ kas_keluars : "dicatat pada"
+    akun_referensis ||--o{ akun_referensis : "parent-child"
+    </div>
+  </div>
+
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });
+  </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+services:
+  app_prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: skp_production
+    restart: unless-stopped
+    ports:
+      # Port 8001 dari host di-mapping ke 8080 container
+      - "8001:8080"
+    extra_hosts:
+      # Memungkinkan container membaca localhost/IP dari server Ubuntu
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .env

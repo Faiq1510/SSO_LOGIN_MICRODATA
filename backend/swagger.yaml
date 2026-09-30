@@ -1,0 +1,480 @@
+openapi: 3.0.3
+info:
+  title: SSO Microdata Identity Provider API
+  description: |
+    ## SSO Microdata — Dokumentasi API & Panduan Integrasi
+
+    Layanan **Single Sign-On (SSO)** berbasis standar **OpenID Connect (OIDC)** yang memungkinkan seluruh aplikasi web Microdata menggunakan satu akun terpusat.
+
+    ### Aplikasi yang Terintegrasi
+    | Aplikasi | Framework | Port | Client ID |
+    |---|---|---|---|
+    | SAIMS (Asset & Inventory) | Next.js + Golang | 3002 | `client-saims` |
+    | Microintern (Manajemen PKL) | React + Express | 5173 | `client-microintern` |
+    | Arsip Surat | Laravel | 8000 | `client-arsip-surat` |
+    | SiteFlow CPC | Laravel | 8001 | `cpc` |
+
+    ---
+
+    ### Cara Kerja Alur Login SSO (Authorization Code Flow + PKCE)
+
+    ```
+    1. User klik "Masuk dengan SSO"  →  Client App
+    2. Client App generate PKCE      →  simpan code_verifier di cookie/session
+    3. Redirect Browser              →  GET /oidc/auth?client_id=...&code_challenge=...
+    4. User Login di SSO Provider    →  Input Username & Password
+    5. SSO redirect kembali          →  GET /sso/callback?code=xxx (ke Client App)
+    6. Client App exchange code      →  POST /oidc/token (server-to-server)
+    7. SSO balas token               →  { access_token, id_token }
+    8. Client ambil profil user      →  GET /oidc/me (Header: Bearer access_token)
+    9. Set cookie session            →  User masuk Dashboard ✓
+    ```
+
+    ---
+
+    ### Panduan Integrasi Web Client Baru
+
+    #### Prasyarat
+    - Client harus terdaftar di database SSO (`INSERT INTO clients ...`)
+    - Memiliki `client_id`, `client_secret`, dan `redirect_uri` yang valid
+
+    #### Step 1 — Konfigurasi Environment Variable di Aplikasi Client
+    ```dotenv
+    # .env atau .env.local
+    SSO_BASE_URL=http://localhost:3000
+    SSO_CLIENT_ID=client-nama-aplikasi
+    SSO_CLIENT_SECRET=secret_key_aplikasi
+    SSO_REDIRECT_URI=http://localhost:PORT/sso/callback
+    ```
+
+    #### Step 2 — Buat Route `/sso/login` (Inisiasi Login)
+    Route ini dipanggil saat user klik tombol "Masuk dengan SSO":
+    ```javascript
+    // Next.js / React (lib/sso.ts)
+    export async function redirectToSSO() {
+      const verifier = generateRandomString(64);
+      const challenge = await sha256base64url(verifier);
+      sessionStorage.setItem('code_verifier', verifier);
+
+      const url = new URL(`${SSO_BASE_URL}/oidc/auth`);
+      url.searchParams.set('client_id', SSO_CLIENT_ID);
+      url.searchParams.set('redirect_uri', SSO_REDIRECT_URI);
+      url.searchParams.set('response_type', 'code');
+      url.searchParams.set('scope', 'openid profile email');
+      url.searchParams.set('code_challenge', challenge);
+      url.searchParams.set('code_challenge_method', 'S256');
+      window.location.href = url.toString();
+    }
+    ```
+    ```php
+    // Laravel (SsoController.php)
+    public function redirect() {
+      $verifier = Str::random(64);
+      $challenge = rtrim(strtr(base64_encode(hash('sha256', $verifier, true)), '+/', '-_'), '=');
+      session(['code_verifier' => $verifier]);
+      return redirect($ssoBaseUrl . '/oidc/auth?' . http_build_query([
+        'client_id' => env('SSO_CLIENT_ID'),
+        'redirect_uri' => env('SSO_REDIRECT_URI'),
+        'response_type' => 'code',
+        'scope' => 'openid profile email',
+        'code_challenge' => $challenge,
+        'code_challenge_method' => 'S256',
+      ]));
+    }
+    ```
+
+    #### Step 3 — Buat Route `/sso/callback` (Terima Code & Exchange Token)
+    Route ini menerima `?code=...` dari SSO setelah user berhasil login:
+    ```javascript
+    // Next.js API Route: src/app/api/sso/exchange/route.ts
+    const tokenRes = await fetch(`${SSO_BASE_URL}/oidc/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        client_id: SSO_CLIENT_ID,
+        client_secret: SSO_CLIENT_SECRET,
+        code: codeFromQuery,
+        redirect_uri: SSO_REDIRECT_URI,
+        code_verifier: codeVerifierFromCookie,
+      }).toString(),
+    });
+    const { access_token } = await tokenRes.json();
+    ```
+    ```php
+    // Laravel (SsoController.php)
+    public function callback(Request $request) {
+      $token = Http::asForm()->post($ssoBaseUrl . '/oidc/token', [
+        'grant_type' => 'authorization_code',
+        'client_id' => env('SSO_CLIENT_ID'),
+        'client_secret' => env('SSO_CLIENT_SECRET'),
+        'code' => $request->get('code'),
+        'redirect_uri' => env('SSO_REDIRECT_URI'),
+        'code_verifier' => session('code_verifier'),
+      ])->json();
+    }
+    ```
+
+    #### Step 4 — Ambil Data Profil User (GET /oidc/me)
+    Gunakan `access_token` untuk mengambil data user dan buat session lokal:
+    ```javascript
+    const userRes = await fetch(`${SSO_BASE_URL}/oidc/me`, {
+      headers: { 'Authorization': `Bearer ${access_token}` }
+    });
+    const user = await userRes.json();
+    // user: { sub, name, email, role, department }
+    ```
+
+    #### Step 5 — Set Session / Cookie & Redirect ke Dashboard
+    ```javascript
+    // Set cookie session di aplikasi client
+    Cookies.set('access_token', access_token, { expires: 1 });
+    localStorage.setItem('user', JSON.stringify(user));
+    router.replace('/dashboard');
+    ```
+
+    ---
+    ### URL Swagger UI
+    - **Local**: http://localhost:3000/api-docs/
+    - **Staging**: https://procurer-uncouth-animate.ngrok-free.dev/api-docs/
+
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Development Local Server
+  - url: https://procurer-uncouth-animate.ngrok-free.dev
+    description: Ngrok Tunnel Server (Public Staging)
+
+tags:
+  - name: Health Check
+    description: Endpoint monitoring status database dan server SSO
+  - name: OIDC Discovery & Auth
+    description: "**[Step 1-4]** Endpoint alur utama login SSO — initiate redirect dan discovery konfigurasi OIDC"
+  - name: OIDC Token & UserInfo
+    description: "**[Step 3-4]** Endpoint pertukaran authorization_code → access_token dan pengambilan profil user"
+  - name: Admin Management
+    description: Endpoint Web Admin — kelola pengguna SSO (tambah/lihat) dan lihat daftar client aktif
+
+paths:
+  /health/db:
+    get:
+      tags:
+        - Health Check
+      summary: Cek status koneksi Database PostgreSQL SSO
+      responses:
+        '200':
+          description: Database terhubung dengan sukses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  db_connected:
+                    type: boolean
+                    example: true
+                  server_time:
+                    type: string
+                    example: "2026-09-30T12:00:00.000Z"
+
+  /oidc/.well-known/openid-configuration:
+    get:
+      tags:
+        - OIDC Discovery & Auth
+      summary: Get OIDC OpenID Configuration (Discovery Document)
+      description: Mengambil metadata konfigurasi OIDC (issuer, authorization_endpoint, token_endpoint, jwks_uri, dll).
+      responses:
+        '200':
+          description: Metadata OIDC Discovery
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  issuer:
+                    type: string
+                    example: http://localhost:3000/oidc
+                  authorization_endpoint:
+                    type: string
+                    example: http://localhost:3000/oidc/auth
+                  token_endpoint:
+                    type: string
+                    example: http://localhost:3000/oidc/token
+                  userinfo_endpoint:
+                    type: string
+                    example: http://localhost:3000/oidc/me
+
+  /oidc/auth:
+    get:
+      tags:
+        - OIDC Discovery & Auth
+      summary: Initiate SSO Login (Redirect Browser)
+      description: |
+        Endpoint browser untuk mengarahkan pengguna ke halaman login SSO.
+        Menggunakan mekanisme Authorization Code Flow dengan PKCE.
+      parameters:
+        - name: client_id
+          in: query
+          required: true
+          schema:
+            type: string
+          example: client-saims
+        - name: redirect_uri
+          in: query
+          required: true
+          schema:
+            type: string
+          example: http://localhost:3002/sso/callback
+        - name: response_type
+          in: query
+          required: true
+          schema:
+            type: string
+          example: code
+        - name: scope
+          in: query
+          required: true
+          schema:
+            type: string
+          example: openid profile email
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+          example: random_state_string
+        - name: code_challenge
+          in: query
+          required: true
+          schema:
+            type: string
+          example: E9MelhCh2CYks...
+        - name: code_challenge_method
+          in: query
+          required: true
+          schema:
+            type: string
+          example: S256
+      responses:
+        '302':
+          description: Redirect ke halaman Login SSO / Client Callback
+
+  /oidc/token:
+    post:
+      tags:
+        - OIDC Token & UserInfo
+      summary: Exchange Authorization Code untuk Access Token & ID Token
+      description: Menukar authorization_code (dengan PKCE) untuk mendapatkan access_token dan id_token.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - grant_type
+                - client_id
+                - code
+                - redirect_uri
+              properties:
+                grant_type:
+                  type: string
+                  example: authorization_code
+                client_id:
+                  type: string
+                  example: client-saims
+                client_secret:
+                  type: string
+                  example: saims_sso_secret_key_8899aabbccddeeff112233
+                code:
+                  type: string
+                  example: spl3T-8a...
+                redirect_uri:
+                  type: string
+                  example: http://localhost:3002/sso/callback
+                code_verifier:
+                  type: string
+                  example: dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+      responses:
+        '200':
+          description: Token berhasil terbit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: Invalid authorization code atau PKCE mismatch
+
+  /oidc/me:
+    get:
+      tags:
+        - OIDC Token & UserInfo
+      summary: Get Authenticated User Profile (UserInfo)
+      description: Mengambil data profil user SSO berdasarkan Access Token.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Berhasil mengambil profil pengguna
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          description: Token tidak valid atau kadaluwarsa
+
+  /admin/users:
+    get:
+      tags:
+        - Admin Management
+      summary: Ambil daftar seluruh Pengguna SSO
+      responses:
+        '200':
+          description: Daftar pengguna berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+    post:
+      tags:
+        - Admin Management
+      summary: Tambah Pengguna Baru ke SSO Provider
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+                - name
+                - email
+              properties:
+                username:
+                  type: string
+                  example: faiq_dev
+                password:
+                  type: string
+                  example: password123
+                name:
+                  type: string
+                  example: Faiq Programmer
+                email:
+                  type: string
+                  example: faiq@microdata.co.id
+      responses:
+        '201':
+          description: User berhasil dibuat
+        '400':
+          description: Username atau Email sudah terdaftar
+
+  /admin/clients:
+    get:
+      tags:
+        - Admin Management
+      summary: Ambil daftar seluruh Client Terdaftar (Read-only)
+      responses:
+        '200':
+          description: Daftar client berhasil dimuat
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clients:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ClientInfo'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Masukkan Access Token yang didapat dari endpoint /oidc/token
+
+  schemas:
+    TokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: eyJhbGciOiJSUzI1NiIs...
+        token_type:
+          type: string
+          example: Bearer
+        expires_in:
+          type: integer
+          example: 3600
+        id_token:
+          type: string
+          example: eyJhbGciOiJSUzI1NiIs...
+        scope:
+          type: string
+          example: openid profile email
+
+    UserProfile:
+      type: object
+      properties:
+        sub:
+          type: string
+          example: "12345"
+        name:
+          type: string
+          example: "Faiq Programmer"
+        email:
+          type: string
+          example: "faiq@microdata.co.id"
+        role:
+          type: string
+          example: "admin"
+        department:
+          type: string
+          example: "IT Development"
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: faiq_dev
+        name:
+          type: string
+          example: Faiq Programmer
+        email:
+          type: string
+          example: faiq@microdata.co.id
+        created_at:
+          type: string
+          example: "2026-09-30T10:00:00Z"
+
+    ClientInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        client_id:
+          type: string
+          example: client-saims
+        name:
+          type: string
+          example: SAIMS Asset Management
+        redirect_uri:
+          type: string
+          example: http://localhost:3002/sso/callback
+        brand_color:
+          type: string
+          example: "#3b82f6"

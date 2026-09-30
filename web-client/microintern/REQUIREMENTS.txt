@@ -1,0 +1,434 @@
+````md
+# Sistem Informasi Manajemen Peserta PKL
+
+## 📌 Deskripsi Proyek
+
+Sistem Informasi Manajemen Peserta PKL adalah aplikasi berbasis web yang digunakan untuk mengelola seluruh proses Praktik Kerja Lapangan (PKL) mulai dari pendaftaran peserta, validasi admin, pencatatan kehadiran, penilaian, hingga pembuatan laporan akhir secara terintegrasi.
+
+Sistem ini dirancang untuk membantu perusahaan dalam meningkatkan efisiensi pengelolaan data peserta PKL yang sebelumnya masih dilakukan secara manual menggunakan spreadsheet seperti Microsoft Excel.
+
+---
+
+# 📖 1. Pendahuluan
+
+## 1.1 Latar Belakang
+
+Perusahaan secara rutin menerima mahasiswa untuk melaksanakan Praktik Kerja Lapangan (PKL) dari berbagai universitas. Proses pengelolaan data peserta PKL saat ini masih dilakukan secara manual menggunakan spreadsheet (Microsoft Excel) yang memiliki beberapa kendala, antara lain:
+
+- Sulit melakukan pencarian data secara cepat
+- Tidak tersedia sistem penilaian terintegrasi
+- Rekam kehadiran tidak terstruktur
+- Pembuatan laporan membutuhkan waktu lama
+- Risiko kehilangan dan duplikasi data cukup tinggi
+
+Berdasarkan permasalahan tersebut, diperlukan sebuah sistem informasi berbasis web yang mampu mengelola seluruh siklus hidup peserta PKL mulai dari pendaftaran hingga pelaporan akhir secara terintegrasi dan efisien.
+
+---
+
+## 1.2 Tujuan Proyek
+
+Tujuan dari pengembangan sistem ini adalah:
+
+- Membangun sistem manajemen peserta PKL berbasis web
+- Menyediakan fitur CRUD (Create, Read, Update, Delete) data peserta PKL
+- Mengimplementasikan sistem penilaian berbasis kriteria terstandar
+- Mengotomatisasi pencatatan dan rekap kehadiran harian
+- Menyediakan dashboard analitik untuk monitoring peserta
+- Menghasilkan laporan yang dapat diekspor dalam format CSV
+- Mempermudah admin HRD dalam mengelola peserta PKL
+
+---
+
+## 1.3 Ruang Lingkup
+
+Ruang lingkup sistem meliputi:
+
+- Sistem berjalan pada browser modern:
+  - Google Chrome
+  - Mozilla Firefox
+  - Microsoft Edge
+  - Safari
+
+- Sistem mendukung:
+  - Desktop
+  - Tablet
+
+- Penyimpanan data:
+  - Menggunakan localStorage browser (versi prototype)
+  - Dapat dikembangkan ke database server
+
+- Pengguna sistem:
+  - Admin HRD (single user)
+
+- Fitur utama:
+  - Manajemen peserta PKL
+  - Validasi peserta
+  - Kehadiran harian
+  - Penilaian peserta
+  - Dashboard statistik
+  - Export laporan CSV
+
+---
+
+# 🔄 2. Siklus Hidup Peserta PKL
+
+## Alur Bisnis Proses
+
+```text
+Pendaftaran
+    ↓
+Menunggu Verifikasi
+    ↓
+┌───────────────┐
+│ Dikonfirmasi  │
+└───────────────┘
+    ↓
+Pencatatan Kehadiran
+    ↓
+Penilaian
+    ↓
+Selesai
+    ↓
+Laporan Export CSV
+
+atau
+
+Menunggu
+    ↓
+Ditolak
+```
+````
+
+---
+
+## Tahapan Siklus PKL
+
+### 1. Pendaftaran
+
+Admin melakukan input data peserta PKL seperti:
+
+- Nama mahasiswa
+- NIM
+- Universitas
+- Jurusan
+- Periode PKL
+- Kontak peserta
+
+Status awal peserta:
+
+```text
+Menunggu
+```
+
+---
+
+### 2. Menunggu Verifikasi
+
+Data peserta menunggu proses validasi dari admin HRD.
+
+Kemungkinan status:
+
+- Menunggu
+- Dikonfirmasi
+- Ditolak
+
+---
+
+### 3. Dikonfirmasi
+
+Peserta dinyatakan diterima untuk melaksanakan PKL.
+
+Status berubah menjadi:
+
+```text
+Aktif
+```
+
+Peserta sudah dapat:
+
+- Melakukan absensi
+- Dinilai oleh pembimbing
+
+---
+
+### 4. Pencatatan Kehadiran
+
+Admin melakukan pencatatan kehadiran harian peserta PKL.
+
+Data kehadiran:
+
+- Tanggal
+- Jam masuk
+- Jam keluar
+- Status hadir
+- Keterangan
+
+---
+
+### 5. Penilaian
+
+Admin atau pembimbing memberikan penilaian berdasarkan beberapa kriteria.
+
+Contoh kriteria:
+
+- Disiplin
+- Kehadiran
+- Komunikasi
+- Kerja Sama
+- Tanggung Jawab
+- Inisiatif
+
+---
+
+### 6. Selesai
+
+Peserta telah menyelesaikan masa PKL.
+
+Status:
+
+```text
+Selesai
+```
+
+---
+
+### 7. Laporan
+
+Sistem dapat menghasilkan:
+
+- Rekap peserta
+- Rekap kehadiran
+- Rekap nilai
+- Export CSV
+
+---
+
+### 8. Ditolak
+
+Peserta tidak diterima untuk PKL.
+
+Status:
+
+```text
+Ditolak
+```
+
+---
+
+# 🧩 3. Fitur Sistem
+
+## Fitur Utama
+
+### 📋 Manajemen Peserta
+
+- Tambah peserta
+- Edit peserta
+- Hapus peserta
+- Cari peserta
+- Filter status peserta
+
+### ✅ Verifikasi Peserta
+
+- Konfirmasi peserta
+- Penolakan peserta
+- Perubahan status otomatis
+
+### 📅 Kehadiran
+
+- Absensi harian
+- Rekap kehadiran
+- Monitoring keterlambatan
+
+### ⭐ Penilaian
+
+- Input nilai
+- Kalkulasi rata-rata
+- Penentuan hasil akhir
+
+### 📊 Dashboard
+
+- Statistik peserta
+- Grafik status peserta
+- Monitoring PKL aktif
+
+### 📁 Export Laporan
+
+- Export CSV
+- Rekap peserta
+- Rekap nilai
+- Rekap absensi
+
+---
+
+# 🏗️ 4. Arsitektur Teknologi
+
+## Frontend
+
+Teknologi frontend yang digunakan:
+
+- HTML5
+- CSS3
+- JavaScript (ES6)
+- Tailwind CSS
+- React.js / Next.js
+
+### Fungsi Frontend
+
+- Tampilan antarmuka pengguna
+- Dashboard admin
+- Form input data
+- Visualisasi statistik
+
+---
+
+## Backend
+
+Teknologi backend yang direkomendasikan:
+
+- Javascript/Typescript
+- Express JS Framework
+
+### Fungsi Backend
+
+- REST API
+- Validasi data
+- Authentication
+- Business logic
+- Export laporan
+
+---
+
+## Database
+
+Database yang dapat digunakan:
+
+### Prototype
+
+- localStorage Browser
+
+### Production
+
+- PostgreSQL
+
+### Fungsi Database
+
+- Penyimpanan data peserta
+- Data absensi
+- Data penilaian
+- Data laporan
+
+---
+
+# 📡 5. Dokumentasi API
+
+Dokumentasi API menggunakan:
+
+- Swagger / OpenAPI
+
+## Endpoint Contoh
+
+### Peserta PKL
+
+```http
+GET /api/peserta
+POST /api/peserta
+PUT /api/peserta/:id
+DELETE /api/peserta/:id
+```
+
+### Kehadiran
+
+```http
+GET /api/kehadiran
+POST /api/kehadiran
+```
+
+### Penilaian
+
+```http
+GET /api/penilaian
+POST /api/penilaian
+```
+
+---
+
+# 👨‍💻 6. Kolaborasi Tim
+
+## Version Control
+
+Sistem menggunakan:
+
+- Git
+- GitLab
+
+## Workflow GitLab
+
+### Branching Strategy
+
+```text
+main
+develop
+feature/*
+hotfix/*
+```
+
+### Proses Development
+
+1. Clone repository
+2. Membuat branch feature
+3. Commit perubahan
+4. Push ke GitLab
+5. Merge Request
+6. Code Review
+7. Merge ke develop/main
+
+---
+
+# 📂 7. Struktur Folder (Contoh)
+
+```bash
+project-pkl/
+│
+├── backend/
+│   ├── cmd/
+│   ├── internal/
+│   ├── routes/
+│   ├── handlers/
+│   ├── services/
+│   ├── repositories/
+│   ├── models/
+│   └── docs/
+│
+├── frontend/
+│   ├── src/
+│   ├── components/
+│   ├── pages/
+│   ├── layouts/
+│   ├── services/
+│   └── assets/
+│
+├── database/
+│   └── migrations/
+│
+├── docs/
+│
+└── README.md
+```
+
+---
+
+# 📌 8. Kesimpulan
+
+Sistem Informasi Manajemen Peserta PKL diharapkan dapat membantu perusahaan dalam mengelola proses PKL secara lebih efektif, cepat, dan terintegrasi dibandingkan metode manual menggunakan spreadsheet.
+
+Dengan adanya sistem ini, proses administrasi PKL menjadi lebih terstruktur, mudah dipantau, serta mendukung pembuatan laporan dan pengambilan keputusan secara efisien.
+
+---
+
+# 👨‍💻 Author
+
+Developed by:
+
+- Tim Pengembang Sistem PKL
+
+---

@@ -1,0 +1,7 @@
+node_modules/
+.env
+repomix-output.md
+.minio-data/
+minio.license
+minio.exe
+.env.private-key

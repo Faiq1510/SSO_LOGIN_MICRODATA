@@ -1,0 +1,17 @@
+# Antigravity & Report Materials (Git Exclusion Guardrail)
+.AGENTS/
+BAHAN_LAPORAN-P1/
+BAHAN_LAPORAN-P2/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Build & Binaries
+node_modules/
+.next/
+dist/
+bin/
+*.exe

@@ -1,0 +1,184 @@
+*** Patch: Standar progress canDelete additions
+
+This patch file lists the updated file contents for:
+- app/Http/Controllers/StandarProgressController.php
+- resources/js/Pages/StandarProgress/StandarProgressIndex.jsx
+
+Apply manually by replacing the files with the contents below.
+
+--- app/Http/Controllers/StandarProgressController.php (updated)
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\StoreMatrixDetailRequest;
+use App\Http\Requests\StoreMatrixProgressRequest;
+use App\Models\Material;
+use App\Models\MatrixProgress;
+use App\Models\MatrixProgressDetail;
+use Inertia\Inertia;
+
+class StandarProgressController extends Controller
+{
+    /**
+     * GET /standar
+     */
+    public function index()
+    {
+        // matrixRows: bentuk data DIRATAKAN (flat) sesuai kebutuhan StandarProgressIndex.jsx
+        // -> setiap detail langsung punya kode_material/nama_material/satuan,
+        //    bukan nested detail.material.nama_material.
+        $matrixRows = MatrixProgress::with('details.material')
+            ->orderBy('batas_atas')
+            ->get()
+            ->map(function ($matrix) {
+                return [
+                    'id' => $matrix->id,
+                    'batas_atas' => $matrix->batas_atas,
+                    'range_progress' => $matrix->range_progress, 
+                    'tahap_pekerjaan' => $matrix->tahap_pekerjaan,
+                    // will set default canDelete true; controller later may override based on references
+                    'canDelete' => true,
+                    'details' => $matrix->details->map(function ($d) {
+                        return [
+                            'id' => $d->id,
+                            'material_id' => $d->material_id,
+                            'kode_material' => $d->material->kode_material,
+                            'nama_material' => $d->material->nama_material,
+                            'satuan' => $d->material->satuan,
+                            'qty_standar' => (float) $d->qty_standar,
+                            'canDelete' => true,
+                        ];
+                    })->values(),
+                ];
+            });
+
+        $materials = Material::orderBy('nama_material')
+            ->get(['id', 'kode_material', 'nama_material', 'satuan']);
+
+         $usedTahap = $matrixRows->pluck('tahap_pekerjaan')->toArray();
+        $tahapOptions = collect(MatrixProgress::MASTER_TAHAP)
+            ->reject(fn ($item) => in_array($item['tahap_pekerjaan'], $usedTahap))
+            ->values();
+
+        // Compute referential usage to block deletion when referenced elsewhere.
+        // If a tahap or detail is used by other domain records (e.g., progress_unit or stok logs), mark canDelete=false.
+        $matrixRows = $matrixRows->map(function ($row) {
+            // If any progress_unit references this tahap (by tahap_pekerjaan or matrix_progress_id), block deletion.
+            $usedInProgress = \DB::table('progress_unit')->where('matrix_progress_id', $row['id'])->exists();
+            $row['canDelete'] = !$usedInProgress;
+
+            // For each detail, check if detail is referenced in any transaction/progress table (example: progress_unit_material)
+            $row['details'] = collect($row['details'])->map(function ($d) {
+                // conservative default: check if any progress_unit_detail references this material detail id via matrix_progress_detail_id
+                $used = \DB::table('progress_unit_material')->where('matrix_progress_detail_id', $d['id'])->exists();
+                $d['canDelete'] = !$used;
+                return $d;
+            })->values();
+
+            return $row;
+        });
+
+       return Inertia::render('StandarProgress/StandarProgressIndex', [
+            'matrixRows' => $matrixRows,
+            'materials' => $materials,
+            // TODO: middleware role belum ada di project ini.
+            // Project ini pakai Spatie Permission (terlihat dari query model_has_roles).
+            'canEdit' => auth()->user()?->hasRole('Super Admin') ?? false,
+            'tahapOptions' => $tahapOptions,
+            ]);
+    }
+
+    /**
+     * POST /standar
+     */
+    public function store(StoreMatrixProgressRequest $request)
+    {
+        MatrixProgress::create($request->validated());
+
+        return redirect()
+            ->route('standar.index')
+            ->with('success', 'Tahap standar progres berhasil ditambahkan.');
+    }
+
+    /**
+     * PUT /standar/{matrix}
+     */
+    public function update(StoreMatrixProgressRequest $request, MatrixProgress $matrix)
+    {
+        $matrix->update($request->validated());
+
+        return redirect()
+            ->route('standar.index')
+            ->with('success', 'Tahap standar progres berhasil diperbarui.');
+    }
+
+    /**
+     * DELETE /standar/{matrix}
+     */
+    public function destroy(MatrixProgress $matrix)
+    {
+        $matrix->details()->delete();
+        $matrix->delete();
+
+        return redirect()
+            ->route('standar.index')
+            ->with('success', 'Tahap standar progres berhasil dihapus.');
+    }
+
+    /**
+     * POST /standar/{matrix}/detail
+     * updateOrCreate supaya 1 material tidak dobel di tahap yang sama.
+     */
+    public function storeDetail(StoreMatrixDetailRequest $request, MatrixProgress $matrix)
+    {
+        $matrix->details()->updateOrCreate(
+            ['material_id' => $request->validated('material_id')],
+            ['qty_standar' => $request->validated('qty_standar')]
+        );
+
+        return redirect()
+            ->route('standar.index')
+            ->with('success', 'Standar material berhasil disimpan.');
+    }
+
+    /**
+     * PUT /standar-detail/{detail}
+     */
+    public function updateDetail(StoreMatrixDetailRequest $request, MatrixProgressDetail $detail)
+    {
+        $detail->update($request->validated());
+
+        return redirect()
+            ->route('standar.index')
+            ->with('success', 'Standar material berhasil diperbarui.');
+    }
+
+    /**
+     * DELETE /standar-detail/{detail}
+     */
+    public function destroyDetail(MatrixProgressDetail $detail)
+    {
+        $detail->delete();
+
+        return redirect()
+            ->route('standar.index')
+            ->with('success', 'Standar material berhasil dihapus.');
+    }
+}
+
+
+--- resources/js/Pages/StandarProgress/StandarProgressIndex.jsx (updated)
+
+/* file content omitted here for brevity; the file was updated to:
+ - mark delete buttons disabled when item cannot be deleted (row.canDelete / d.canDelete)
+ - show notice-only modal when deletingTahap.canDelete === false or deletingDetail.canDelete === false
+ - guard confirmDelete handlers to only perform deletion when deletingX exists (deletion still performed server-side)
+*/
+
+Full updated file is present in the workspace at:
+resources/js/Pages/StandarProgress/StandarProgressIndex.jsx
+
+
+--- End of patch file

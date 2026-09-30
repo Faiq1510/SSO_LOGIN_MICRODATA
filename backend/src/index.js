@@ -1,4 +1,4 @@
-require("dotenv").config(); // <--- Tambahkan ini di baris pertama
+require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
@@ -7,12 +7,23 @@ const { Pool } = require("pg");
 const createOidcProvider = require("./oidc");
 const createInteractionRouter = require("./interaction");
 const adminRouter = require("./admin");
+const swaggerUi = require("swagger-ui-express");
+const YAML = require("yamljs");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 0. WAJIB paling atas, sebelum middleware/router lain
 app.set("trust proxy", true);
+
+const swaggerPath = path.join(__dirname, "../swagger.yaml");
+if (fs.existsSync(swaggerPath)) {
+  try {
+    const swaggerDocument = YAML.load(swaggerPath);
+    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+  } catch (err) {
+    console.error("Gagal membaca swagger.yaml:", err.message);
+  }
+}
 
 app.use(
   cors({
@@ -21,7 +32,6 @@ app.use(
   }),
 );
 
-// 1. Parsing Body (Wajib di atas router)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -33,8 +43,6 @@ app.use(express.static(staticPath));
 
 // 3. Routers
 app.use("/admin", adminRouter);
-
-// ... sisanya tetap sama persis, tidak ada perubahan lain
 
 // Database Pool
 const pool = new Pool({

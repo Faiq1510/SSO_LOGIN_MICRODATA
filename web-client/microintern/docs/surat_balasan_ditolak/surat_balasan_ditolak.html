@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Surat Balasan Magang - PT. Microdata Indonesia</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Times New Roman", serif;
+        font-size: 12pt;
+        background: #f0f0f0;
+        display: flex;
+        justify-content: center;
+        padding: 30px 0;
+      }
+
+      .page {
+        width: 210mm;
+        min-height: 297mm;
+        background: white;
+        padding: 14mm 20mm 14mm 25mm;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Kop Surat */
+      .kop img {
+        width: 100%;
+        max-width: 100%;
+        display: block;
+      }
+
+      /* Meta surat */
+      .meta-surat {
+        margin-top: 16px;
+        line-height: 1.8;
+      }
+
+      .meta-surat table {
+        border-collapse: collapse;
+      }
+
+      .meta-surat td {
+        vertical-align: top;
+        padding: 0;
+      }
+
+      .meta-surat .label {
+        min-width: 90px;
+      }
+
+      .meta-surat .colon {
+        padding: 0 6px;
+      }
+
+      /* Alamat tujuan */
+      .tujuan {
+        margin-top: 20px;
+      }
+
+      .tujuan p {
+        line-height: 1.5;
+      }
+
+      /* Isi surat */
+      .isi {
+        margin-top: 20px;
+      }
+
+      .isi p {
+        text-align: justify;
+        line-height: 1.8;
+        margin-bottom: 8px;
+      }
+
+      /* Tabel mahasiswa */
+      .tabel-mahasiswa {
+        margin-top: 12px;
+        margin-bottom: 12px;
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      .tabel-mahasiswa th {
+        background-color: #404040;
+        color: white;
+        font-size: 12pt;
+        font-family: "Times New Roman", serif;
+        padding: 6px 10px;
+        border: 1px solid black;
+        text-align: center;
+      }
+
+      .tabel-mahasiswa td {
+        border: 1px solid black;
+        padding: 5px 10px;
+        font-size: 12pt;
+        font-family: "Times New Roman", serif;
+      }
+
+      .tabel-mahasiswa td.no {
+        text-align: center;
+        width: 40px;
+      }
+
+      .tabel-mahasiswa td.nim {
+        text-align: right;
+        width: 120px;
+      }
+
+      .tabel-mahasiswa td.prodi {
+        width: 160px;
+      }
+
+      /* Penutup & tanda tangan */
+      .penutup {
+        margin-top: 8px;
+      }
+
+      .penutup p {
+        text-align: justify;
+        line-height: 1.8;
+      }
+
+      .ttd {
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+
+      .ttd-kiri {
+        display: flex;
+        align-items: center;
+      }
+
+      .ttd-kiri img {
+        width: 110px;
+        height: 110px;
+        object-fit: contain;
+      }
+
+      .ttd-kanan {
+        text-align: left;
+      }
+
+      .ttd-kanan .kota-tanggal {
+        font-family: "Calibri", sans-serif;
+        font-size: 12pt;
+        margin-bottom: 4px;
+      }
+
+      .ttd-kanan .nama-perusahaan {
+        font-family: "Calibri", sans-serif;
+        font-size: 12pt;
+        font-weight: bold;
+        margin-bottom: 8px;
+      }
+
+      .ttd-kanan img {
+        width: 170px;
+        display: block;
+        margin: 0 0 4px;
+      }
+
+      .ttd-kanan .jabatan {
+        font-family: "Calibri", sans-serif;
+        font-size: 12pt;
+        font-weight: bold;
+        font-style: italic;
+      }
+
+      @media print {
+        body {
+          background: white;
+          padding: 0;
+        }
+
+        .page {
+          box-shadow: none;
+          width: 100%;
+          padding: 14mm 20mm 14mm 25mm;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="page">
+      <!-- Kop Surat -->
+      <div class="kop">
+        <img src="surat_balasan_ditolak_files/image001.png" alt="Kop Surat PT. Microdata Indonesia" />
+      </div>
+
+      <!-- Meta Surat -->
+      <div class="meta-surat">
+        <table>
+          <tr>
+            <td class="label">No</td>
+            <td class="colon">:</td>
+            <td>068/SDM/PT-MDI/V/2026</td>
+          </tr>
+          <tr>
+            <td class="label">Lampiran</td>
+            <td class="colon">:</td>
+            <td>-</td>
+          </tr>
+          <tr>
+            <td class="label">Perihal</td>
+            <td class="colon">:</td>
+            <td>Balasan Permohonan Kerja Praktik</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Tujuan Surat -->
+      <div class="tujuan">
+        <p><strong>Kepada Yth.</strong></p>
+        <p><strong>Ka. Dekan Fakultas Teknologi Industri</strong> di <strong>Tempat</strong></p>
+      </div>
+
+      <!-- Isi Surat -->
+      <div class="isi">
+        <p>Dengan hormat,</p>
+        <p>Berdasarkan surat nomor: 4469/DST/IT9.3.3/PK.01.06/2026 tanggal 12 Mei 2026 - perihal Surat Permohonan Kerja Praktek kepada mahasiswa:</p>
+
+        <!-- Tabel Mahasiswa -->
+        <table class="tabel-mahasiswa">
+          <thead>
+            <tr>
+              <th style="width: 40px">No</th>
+              <th>Nama Mahasiswa</th>
+              <th style="width: 120px">NIM</th>
+              <th style="width: 160px">Program Studi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="no">1</td>
+              <td>Andika Dinata</td>
+              <td class="nim">123140096</td>
+              <td class="prodi" rowspan="3" style="vertical-align: middle; text-align: center">Teknik Informatika</td>
+            </tr>
+            <tr>
+              <td class="no">2</td>
+              <td>Deva Hafid Chairul Fani</td>
+              <td class="nim">123140026</td>
+            </tr>
+            <tr>
+              <td class="no">3</td>
+              <td>Satria Lemana Putra</td>
+              <td class="nim">123140088</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Penutup -->
+        <div class="penutup">
+          <p>
+            Bersama ini kami sampaikan bahwa dengan berat hati pengajuan permohonan magang untuk mahasiswa tersebut <strong>tidak dapat kami terima</strong> dikarenakan kuota
+            peserta magang untuk periode tersebut sudah penuh / alasan lainnya. Demikian
+          </p>
+          <p>surat ini kami sampaikan, atas perhatian dan kerjasamanya kami ucapkan terima kasih.</p>
+        </div>
+      </div>
+
+      <!-- Tanda Tangan -->
+      <div class="ttd">
+        <!-- Kiri: Stempel -->
+        <div class="ttd-kiri">
+          <img src="surat_balasan_ditolak_files/image002.jpg" alt="Stempel" />
+        </div>
+
+        <!-- Kanan: Tanda Tangan & Jabatan -->
+        <div class="ttd-kanan">
+          <p class="kota-tanggal">Bandar Lampung, 20 Mei 2026</p>
+          <p class="nama-perusahaan">PT. Microdata Indonesia</p>
+          <img src="surat_balasan_ditolak_files/image003.png" alt="Tanda Tangan" />
+          <p class="jabatan">Direktur Operasional</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

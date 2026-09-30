@@ -1,0 +1,25 @@
+# Environment Variables
+.env
+
+# Go workspace and build files
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+/vendor/
+/build/
+/bin/
+
+# Test/Scratch Files
+test_db.go
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Docker files (Optional: hide volume data if mapped locally)
+postgres_data/
+

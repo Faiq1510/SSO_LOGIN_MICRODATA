@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Surat Balasan Magang - PT. Microdata Indonesia</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Times New Roman", serif;
+        font-size: 12pt;
+        background: white;
+      }
+
+      .page {
+        width: 210mm;
+        min-height: 297mm;
+        background: white;
+        padding: 14mm 20mm 14mm 25mm;
+      }
+
+      .kop img {
+        width: 100%;
+        max-width: 100%;
+        display: block;
+      }
+
+      .meta-surat {
+        margin-top: 16px;
+        line-height: 1.8;
+      }
+
+      .meta-surat table {
+        border-collapse: collapse;
+      }
+
+      .meta-surat td {
+        vertical-align: top;
+        padding: 0;
+      }
+
+      .meta-surat .label {
+        min-width: 90px;
+      }
+
+      .meta-surat .colon {
+        padding: 0 6px;
+      }
+
+      .tujuan {
+        margin-top: 20px;
+      }
+
+      .tujuan p {
+        line-height: 1.5;
+      }
+
+      .isi {
+        margin-top: 20px;
+      }
+
+      .isi p {
+        text-align: justify;
+        line-height: 1.8;
+        margin-bottom: 8px;
+      }
+
+      .tabel-mahasiswa {
+        margin-top: 12px;
+        margin-bottom: 12px;
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      .tabel-mahasiswa th {
+        background-color: #404040;
+        color: white;
+        font-size: 12pt;
+        font-family: "Times New Roman", serif;
+        padding: 6px 10px;
+        border: 1px solid black;
+        text-align: center;
+      }
+
+      .tabel-mahasiswa td {
+        border: 1px solid black;
+        padding: 5px 10px;
+        font-size: 12pt;
+        font-family: "Times New Roman", serif;
+      }
+
+      .tabel-mahasiswa td.no {
+        text-align: center;
+        width: 40px;
+      }
+
+      .tabel-mahasiswa td.nim {
+        text-align: right;
+        width: 120px;
+      }
+
+      .tabel-mahasiswa td.prodi {
+        width: 160px;
+      }
+
+      .penutup {
+        margin-top: 8px;
+      }
+
+      .penutup p {
+        text-align: justify;
+        line-height: 1.8;
+      }
+
+      .ttd {
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+
+      .ttd-kiri {
+        display: flex;
+        align-items: center;
+      }
+
+      .ttd-kiri img {
+        width: 110px;
+        height: 110px;
+        object-fit: contain;
+      }
+
+      .ttd-kanan {
+        text-align: left;
+      }
+
+      .ttd-kanan .kota-tanggal {
+        font-family: "Calibri", sans-serif;
+        font-size: 12pt;
+        margin-bottom: 4px;
+      }
+
+      .ttd-kanan .nama-perusahaan {
+        font-family: "Calibri", sans-serif;
+        font-size: 12pt;
+        font-weight: bold;
+        margin-bottom: 8px;
+      }
+
+      .ttd-kanan img {
+        width: 170px;
+        display: block;
+        margin: 0 0 4px;
+      }
+
+      .ttd-kanan .jabatan {
+        font-family: "Calibri", sans-serif;
+        font-size: 12pt;
+        font-weight: bold;
+        font-style: italic;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="page">
+      <div class="kop">
+        <img src="{{IMAGE_KOP}}" alt="Kop Surat PT. Microdata Indonesia" />
+      </div>
+
+      <div class="meta-surat">
+        <table>
+          <tr>
+            <td class="label">No</td>
+            <td class="colon">:</td>
+            <td>{{NOMOR_SURAT}}</td>
+          </tr>
+          <tr>
+            <td class="label">Lampiran</td>
+            <td class="colon">:</td>
+            <td>-</td>
+          </tr>
+          <tr>
+            <td class="label">Perihal</td>
+            <td class="colon">:</td>
+            <td>Balasan Permohonan Kerja Praktik</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="tujuan">
+        <p><strong>Kepada Yth.</strong></p>
+        <p><strong>{{NAMA_PENERBIT_SURAT}}</strong></p>
+        <p>di <strong>Tempat</strong></p>
+      </div>
+
+      <div class="isi">
+        <p>Dengan hormat,</p>
+        <p>Berdasarkan surat nomor: {{NOMOR_SURAT_PENGANTAR}} tanggal {{TANGGAL_SURAT_PENGANTAR}} - perihal {{PERIHAL_SURAT}} kepada mahasiswa:</p>
+
+        <table class="tabel-mahasiswa">
+          <thead>
+            <tr>
+              <th style="width: 40px">No</th>
+              <th>Nama Mahasiswa</th>
+              <th style="width: 120px">{{LABEL_IDENTITAS}}</th>
+              <th style="width: 160px">Program Studi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{TABEL_MAHASISWA_ROWS}}
+          </tbody>
+        </table>
+
+        <div class="penutup">
+          <p>
+            Bersama ini kami sampaikan bahwa mahasiswa tersebut dapat <strong>diterima</strong> untuk melaksanakan program magang di perusahaan kami, terhitung mulai tanggal
+            {{TANGGAL_MASUK}} - {{TANGGAL_KELUAR}}. Demikian surat ini kami sampaikan, atas perhatian dan kerjasamanya kami ucapkan terima kasih.
+          </p>
+        </div>
+      </div>
+
+      <div class="ttd">
+        <div class="ttd-kiri">
+          <img src="{{IMAGE_STEMPEL}}" alt="Stempel" />
+        </div>
+
+        <div class="ttd-kanan">
+          <p class="kota-tanggal">{{KOTA_TANGGAL}}</p>
+          <p class="nama-perusahaan">PT. Microdata Indonesia</p>
+          <img src="{{IMAGE_TTD}}" alt="Tanda Tangan" />
+          <p class="jabatan">Direktur Operasional</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
