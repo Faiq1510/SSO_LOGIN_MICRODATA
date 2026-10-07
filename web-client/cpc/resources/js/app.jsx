@@ -4,6 +4,14 @@ import { createInertiaApp, router } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { createRoot } from "react-dom/client";
 
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/service-worker.js").catch((error) => {
+            console.error("CPC service worker gagal didaftarkan:", error);
+        });
+    });
+}
+
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
 router.on("invalid", (event) => {

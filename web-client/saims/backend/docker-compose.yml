@@ -15,21 +15,21 @@ services:
     restart: always
 
   minio:
-    image: quay.io/minio/minio:latest
+    image: docker.io/minio/minio:latest
     container_name: saims_minio
     environment:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
     ports:
-      - "9002:9000"
-      - "9003:9001"
+      - "9004:9000"
+      - "9005:9001"
     volumes:
       - minio_data:/data
     command: server /data --console-address ":9001"
     restart: always
 
   minio-create-bucket:
-    image: quay.io/minio/mc:latest
+    image: docker.io/minio/mc:latest
     container_name: saims_minio_setup
     depends_on:
       - minio

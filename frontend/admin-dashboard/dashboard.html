@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Panel admin untuk mengelola user dan client pada microdata Identity Cloud."
+    />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="stylesheet" href="/admin-dashboard/dashboard.css" />
+    <title>Admin | microdata</title>
+  </head>
+  <body>
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen">
+      <div class="login-topbar">
+        <div class="brand-lockup">
+          <div class="brand-mark" aria-hidden="true">m</div>
+          <span class="brand-name">microdata</span>
+        </div>
+        <span class="secure-badge"
+          ><span class="pulse-dot"></span> Admin portal</span
+        >
+      </div>
+
+      <div class="login-card">
+        <p class="login-eyebrow">MICRODATA IDENTITY CLOUD</p>
+        <h1>Admin masuk</h1>
+        <p class="login-sub">Kelola user dan aplikasi yang terdaftar di SSO.</p>
+
+        <div id="loginError"></div>
+
+        <form id="loginForm">
+          <div class="field-group">
+            <label class="field-label" for="adminUsername">Username</label>
+            <div class="input-wrap">
+              <span class="input-icon" aria-hidden="true">@</span>
+              <input
+                id="adminUsername"
+                name="username"
+                autocomplete="username"
+                placeholder="Masukkan username"
+                required
+              />
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="adminPassword">Password</label>
+            <div class="input-wrap">
+              <span class="input-icon" aria-hidden="true">*</span>
+              <input
+                id="adminPassword"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                placeholder="Masukkan password"
+                required
+              />
+            </div>
+          </div>
+          <button class="btn-login" type="submit">Masuk ke dashboard</button>
+        </form>
+
+        <p class="login-footer">
+          Akses terbatas — hanya untuk administrator sistem.
+        </p>
+      </div>
+    </div>
+
+    <!-- APP SHELL -->
+    <div id="app" class="hidden">
+      <aside>
+        <div class="sidebar-brand">
+          <div class="sidebar-brand-mark" aria-hidden="true">m</div>
+          <div class="sidebar-brand-text">
+            <span class="sidebar-brand-name">microdata</span>
+            <span class="sidebar-brand-sub">Admin Console</span>
+          </div>
+        </div>
+
+        <p class="nav-label">Navigasi</p>
+        <nav>
+          <button data-view="users" class="active">
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            Users
+          </button>
+          <button data-view="clients">
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+            </svg>
+            Clients
+          </button>
+        </nav>
+
+        <div class="sidebar-status">
+          <span class="status-dot"></span>
+          Sistem autentikasi aktif
+        </div>
+
+        <div class="account-box">
+          <div class="account-info">
+            <div class="account-avatar" id="accountAvatar" aria-hidden="true">
+              ?
+            </div>
+            <div class="account-meta">
+              <span class="account-role">Administrator</span>
+              <span class="account-name" id="whoAmI">—</span>
+            </div>
+          </div>
+          <button id="logoutBtn">
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      <main>
+        <!-- View: Users -->
+        <section id="view-users" class="view active">
+          <div class="page-header">
+            <p class="page-eyebrow">MICRODATA ADMIN</p>
+            <h2>Users</h2>
+            <p class="page-subtitle">
+              Daftar akun yang bisa login lewat SSO ini.
+            </p>
+          </div>
+
+          <div id="userBanner" class="banner error">
+            <span class="msg"></span>
+            <span class="close" onclick="hideBanner('userBanner')">✕</span>
+          </div>
+
+          <form class="add-form" id="userForm">
+            <label class="full"
+              >Username<input
+                name="username"
+                placeholder="contoh: budi"
+                required
+            /></label>
+            <label
+              >Password<input
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                required
+            /></label>
+            <label
+              >Nama<input name="name" placeholder="Budi Santoso" required
+            /></label>
+            <label class="full"
+              >Email<input
+                name="email"
+                type="email"
+                placeholder="budi@contoh.com"
+                required
+            /></label>
+            <div class="full">
+              <button class="btn btn-primary" style="width: auto" type="submit">
+                + Tambah user
+              </button>
+            </div>
+          </form>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Username</th>
+                  <th>Nama</th>
+                  <th>Email</th>
+                  <th>Dibuat</th>
+                </tr>
+              </thead>
+              <tbody id="userRows"></tbody>
+            </table>
+            <div id="userEmpty" class="empty-state" style="display: none">
+              <div class="empty-mark">👤</div>
+              Belum ada user. Tambahkan lewat form di atas.
+            </div>
+          </div>
+        </section>
+
+        <!-- View: Clients -->
+        <section id="view-clients" class="view">
+          <div class="page-header">
+            <p class="page-eyebrow">MICRODATA ADMIN</p>
+            <h2>Clients</h2>
+            <p class="page-subtitle">
+              Aplikasi yang terdaftar untuk memakai SSO ini.
+            </p>
+          </div>
+
+          <div id="clientBanner" class="banner error">
+            <span class="msg"></span>
+            <span class="close" onclick="hideBanner('clientBanner')">✕</span>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Client ID</th>
+                  <th>Nama</th>
+                  <th>Redirect URI</th>
+                  <th>Dibuat</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="clientRows"></tbody>
+            </table>
+            <div id="clientEmpty" class="empty-state" style="display: none">
+              <div class="empty-mark">📱</div>
+              Belum ada client terdaftar.
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="/admin-dashboard/dashboard.js" defer></script>
+  </body>
+</html>

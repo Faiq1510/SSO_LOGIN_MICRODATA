@@ -70,10 +70,6 @@ function requireAdminSession(req, res, next) {
   next();
 }
 
-// =========================================================================
-// LOGIN & LOGOUT (route ini TIDAK dilindungi requireAdminSession)
-// =========================================================================
-
 router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -111,14 +107,7 @@ router.get("/me", requireAdminSession, (req, res) => {
   res.json({ username: req.admin.username });
 });
 
-// =========================================================================
-// Mulai dari sini, SEMUA route di bawah wajib login
-// =========================================================================
 router.use(requireAdminSession);
-
-// =========================================================================
-// 1. MANAGEMENT USER (tidak berubah dari sebelumnya)
-// =========================================================================
 
 router.post("/users", async (req, res) => {
   try {
@@ -167,9 +156,50 @@ router.delete("/users/:id", async (req, res) => {
 });
 
 // =========================================================================
+// 2. MANAGEMENT CLIENT (tidak berubah dari sebelumnya)
 // =========================================================================
-// 2. MANAGEMENT CLIENT (Read-only untuk Portal Launcher)
-// =========================================================================
+
+router.post("/clients", async (req, res) => {
+  try {
+    const {
+      client_id,
+      name,
+      redirect_uri,
+      post_logout_redirect_uri,
+      brand_color,
+    } = req.body;
+    if (!client_id || !name || !redirect_uri) {
+      return res
+        .status(400)
+        .json({ error: "client_id, name, dan redirect_uri wajib diisi." });
+    }
+    const clientSecret =
+      req.body.client_secret || crypto.randomBytes(32).toString("hex");
+    const result = await pool.query(
+      `INSERT INTO clients (client_id, client_secret, redirect_uri, post_logout_redirect_uri, name, brand_color)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id, client_id, name, redirect_uri, post_logout_redirect_uri, brand_color`,
+      [
+        client_id,
+        clientSecret,
+        redirect_uri,
+        post_logout_redirect_uri || null,
+        name,
+        brand_color || null,
+      ],
+    );
+    res.status(201).json({
+      message: "Client aplikasi berhasil didaftarkan",
+      client: result.rows[0],
+      client_secret: clientSecret,
+    });
+  } catch (err) {
+    if (err.code === "23505") {
+      return res.status(400).json({ error: "client_id sudah digunakan." });
+    }
+    res.status(500).json({ error: err.message });
+  }
+});
 
 router.get("/clients", async (req, res) => {
   try {
@@ -177,6 +207,17 @@ router.get("/clients", async (req, res) => {
       "SELECT id, client_id, name, redirect_uri, post_logout_redirect_uri, brand_color, created_at FROM clients ORDER BY id ASC",
     );
     res.json({ clients: result.rows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.delete("/clients/:client_id", async (req, res) => {
+  try {
+    await pool.query("DELETE FROM clients WHERE client_id = $1", [
+      req.params.client_id,
+    ]);
+    res.json({ message: `Client ${req.params.client_id} berhasil dihapus` });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

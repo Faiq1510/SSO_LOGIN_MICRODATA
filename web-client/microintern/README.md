@@ -120,12 +120,12 @@ Sistem ini dirancang menggunakan arsitektur modern Client-Server dengan teknolog
    | `JWT_REFRESH_SECRET`  | Secret key untuk refresh token JWT                                                         |
    | `JWT_EXPIRATION_TIME` | Masa berlaku access token (contoh: `1d`, `2h`)                                             |
    | `MINIO_ENDPOINT`      | Host MinIO server (default: `localhost`)                                                   |
-   | `MINIO_PORT`          | Port MinIO (default: `9000`)                                                               |
+   | `MINIO_PORT`          | Port MinIO (default: `9002`, karena port `9000` digunakan portal launcher)                  |
    | `MINIO_USE_SSL`       | Gunakan SSL? (`true`/`false`)                                                              |
    | `MINIO_ACCESS_KEY`    | Root user / access key MinIO                                                               |
    | `MINIO_SECRET_KEY`    | Root password / secret key MinIO                                                           |
    | `MINIO_BUCKET`        | Nama bucket MinIO (default: `microintern`)                                                 |
-   | `MINIO_PUBLIC_URL`    | URL publik MinIO — digunakan backend untuk mengakses file. Contoh: `http://localhost:9000` |
+   | `MINIO_PUBLIC_URL`    | URL publik MinIO — digunakan backend untuk mengakses file. Contoh: `http://localhost:9002` |
    | `MAIL_USER`           | Email Gmail pengirim notifikasi                                                            |
    | `MAIL_PASS`           | App Password Gmail (bukan password akun biasa)                                             |
    | `SSO_SHARED_SECRET`   | Secret bersama untuk integrasi SSO                                                         |
@@ -141,7 +141,7 @@ Sistem ini dirancang menggunakan arsitektur modern Client-Server dengan teknolog
 
    | Variabel                | Keterangan                                                                                              |
    | ----------------------- | ------------------------------------------------------------------------------------------------------- |
-   | `VITE_API_URL`          | URL base API backend. Contoh: `http://localhost:3000/api`                                               |
+   | `VITE_API_URL`          | URL base API backend. Contoh: `http://localhost:5001/api`                                               |
    | `VITE_MINIO_PUBLIC_URL` | URL publik MinIO — **harus sama** dengan `MINIO_PUBLIC_URL` di backend. Contoh: `http://localhost:9000` |
    | `VITE_MINIO_BUCKET`     | Nama bucket MinIO — **harus sama** dengan `MINIO_BUCKET` di backend. Contoh: `microintern`              |
 

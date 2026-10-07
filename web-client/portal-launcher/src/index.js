@@ -89,9 +89,67 @@ if (fs.existsSync(logoSrc) && !fs.existsSync(logoDest)) {
 }
 
 app.use("/images", express.static(logoPublicDir));
+app.use(express.static(path.join(__dirname, "../public")));
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 
+// Helper untuk metadata aplikasi (Icon SVG, Role, Deskripsi)
+function getAppMetadata(app) {
+  const name = (app.client_name || app.name || app.client_id || "").toLowerCase();
+
+  if (name.includes("surat") || name.includes("arsip")) {
+    return {
+      category: "Website",
+      roles: ["Admin", "Supervisor"],
+      logoSvg: `<svg class="w-16 h-16 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`,
+      brandTitle: "ARSIP SURAT",
+      shortDesc: "Penomoran & Tata Kelola Surat"
+    };
+  } else if (name.includes("intern") || name.includes("pkl") || name.includes("microintern")) {
+    return {
+      category: "Website",
+      roles: ["Admin", "Peserta"],
+      logoSvg: `<svg class="w-16 h-16 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>`,
+      brandTitle: "MICROINTERN PKL",
+      shortDesc: "Portal Manajamen Magang & PKL"
+    };
+  } else if (name.includes("cpc") || name.includes("siteflow")) {
+    return {
+      category: "Website",
+      roles: ["Admin", "Operator"],
+      logoSvg: `<svg class="w-16 h-16 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>`,
+      brandTitle: "SITEFLOW CPC",
+      shortDesc: "Logistik & Cash Processing Center"
+    };
+  } else if (name.includes("saims") || name.includes("inventaris") || name.includes("asset")) {
+    return {
+      category: "Website",
+      roles: ["Admin", "Staff"],
+      logoSvg: `<svg class="w-16 h-16 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>`,
+      brandTitle: "SAIMS INVENTARIS",
+      shortDesc: "Peminjaman & Inventaris Aset"
+    };
+  }
+
+  return {
+    category: "Website",
+    roles: ["Admin"],
+    logoSvg: `<svg class="w-16 h-16 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>`,
+    brandTitle: (app.client_name || app.name || app.client_id || "APLIKASI").toUpperCase(),
+    shortDesc: "Aplikasi Terintegrasi SSO"
+  };
+}
+
+
+function renderPortal({ cards, emptyState, user }) {
+  const templatePath = path.join(__dirname, "../views/portal.html");
+  return fs
+    .readFileSync(templatePath, "utf8")
+    .replaceAll("{{CARDS}}", cards)
+    .replaceAll("{{EMPTY_STATE}}", emptyState)
+    .replaceAll("{{USER_NAME}}", user.name || user.sub)
+    .replaceAll("{{USER_EMAIL}}", user.email || "SSO Authenticated User");
+}
 // GET / — Halaman portal utama (harus login)
 app.get("/", requireAuth, async (req, res) => {
   let apps = [];
@@ -109,330 +167,66 @@ app.get("/", requireAuth, async (req, res) => {
 
   const user = req.user;
 
-  // Render kartu untuk setiap aplikasi
+  // Render kartu aplikasi dengan Microdata layout & Tailwind styling
   const cards = apps
     .map((app) => {
       const displayName = app.client_name || app.name || app.client_id;
-      const initial = getInitial(displayName);
-      const gradient = buildGradient(app.brand_color);
+      const meta = getAppMetadata(app);
       const appUrl = app.app_url;
+      const roleBadges = meta.roles
+        .map(r => `<span class="bg-white/15 text-white/90 text-[11px] font-medium px-2.5 py-0.5 rounded-md border border-white/10">${r}</span>`)
+        .join(" ");
 
       return `
-      <a href="${appUrl}" class="app-card" style="--card-gradient: ${gradient};">
-        <div class="card-icon">
-          <span>${initial}</span>
+      <div class="app-card-item flex-shrink-0 w-[calc(100vw-3rem)] max-w-80 sm:w-80 md:w-72 snap-start group" data-category="${meta.category.toLowerCase()}" data-title="${displayName.toLowerCase()} ${meta.brandTitle.toLowerCase()} ${meta.shortDesc.toLowerCase()}">
+        <div class="bg-gradient-to-b from-white/15 to-white/5 backdrop-blur-xl border border-white/15 rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 transform hover:-translate-y-2 hover:shadow-indigo-500/20 hover:border-white/30 flex flex-col h-full">
+          <!-- Upper White Box Container for Logo -->
+          <div class="h-44 bg-white p-6 flex flex-col items-center justify-center relative overflow-hidden group-hover:bg-slate-50 transition-colors">
+            <div class="transform group-hover:scale-110 transition-transform duration-300">
+              ${meta.logoSvg}
+            </div>
+            <div class="mt-3 font-extrabold text-sm tracking-widest text-slate-800 uppercase text-center truncate w-full px-2">
+              ${meta.brandTitle}
+            </div>
+          </div>
+
+          <!-- Lower Dark Glass Info & Actions -->
+          <div class="p-5 flex-1 flex flex-col justify-between bg-slate-950/40 backdrop-blur-md">
+            <div>
+              <h3 class="text-white font-bold text-sm tracking-wide mb-1 uppercase truncate" title="${displayName}">
+                ${displayName}
+              </h3>
+              <p class="text-xs text-slate-400 mb-3 line-clamp-1">${meta.shortDesc}</p>
+              
+              <!-- Roles Badges -->
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-[11px] text-slate-400 font-medium">Role:</span>
+                ${roleBadges}
+              </div>
+            </div>
+
+            <!-- Launch Button -->
+            <a href="${appUrl}" class="mt-5 w-full flex items-center justify-between px-4 py-2.5 bg-white/10 hover:bg-indigo-600 border border-white/15 hover:border-indigo-400 rounded-xl text-xs font-semibold text-white transition-all duration-200 shadow-md group/btn">
+              <span>Launch</span>
+              <svg class="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
+            </a>
+          </div>
         </div>
-        <div class="card-info">
-          <h3>${displayName}</h3>
-          <span class="card-open">Buka Aplikasi →</span>
-        </div>
-      </a>`;
+      </div>`;
     })
     .join("");
 
   const emptyState =
     apps.length === 0
-      ? `<div class="empty-state">
-          <p>🔍 Belum ada aplikasi yang terdaftar dengan URL aktif.</p>
-          <p>Tambahkan <code>app_url</code> pada tabel <code>clients</code> di database SSO.</p>
+      ? `<div class="w-full text-center py-16 text-slate-300 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10">
+          <p class="text-lg font-medium">🔍 Belum ada aplikasi yang terdaftar dengan URL aktif.</p>
+          <p class="text-sm text-slate-400 mt-1">Tambahkan <code class="bg-white/10 px-2 py-0.5 rounded text-indigo-300">app_url</code> pada tabel <code class="bg-white/10 px-2 py-0.5 rounded text-indigo-300">clients</code> di database SSO.</p>
         </div>`
       : "";
 
-  res.send(`<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Portal Aplikasi | Microdata</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; }
-
-    :root {
-      --ink: #102a43;
-      --muted: #64748b;
-      --paper: #f0f4f8;
-      --white: #ffffff;
-      --lime: #c5e86c;
-      --teal: #1f7a78;
-      --shadow-sm: 0 2px 8px rgba(16,42,67,0.08);
-      --shadow-md: 0 8px 32px rgba(16,42,67,0.12);
-      --shadow-hover: 0 20px 48px rgba(16,42,67,0.2);
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: var(--paper);
-      font-family: 'Manrope', 'Segoe UI', sans-serif;
-      color: var(--ink);
-    }
-
-    /* ── Topbar ── */
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 40px;
-      height: 64px;
-      background: var(--ink);
-      box-shadow: var(--shadow-md);
-    }
-
-    .topbar-brand img {
-      height: 38px;
-      width: auto;
-      object-fit: contain;
-      filter: brightness(110%);
-    }
-
-    .topbar-user {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .user-avatar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 38px;
-      height: 38px;
-      background: var(--lime);
-      color: var(--ink);
-      border-radius: 50%;
-      font-size: 15px;
-      font-weight: 800;
-      flex-shrink: 0;
-    }
-
-    .user-name {
-      color: #f0f4f8;
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .logout-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 7px 16px;
-      background: transparent;
-      border: 1px solid rgba(255,255,255,0.25);
-      border-radius: 8px;
-      color: rgba(255,255,255,0.8);
-      font: inherit;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 180ms ease;
-      text-decoration: none;
-    }
-    .logout-btn:hover {
-      background: rgba(255,255,255,0.1);
-      border-color: rgba(255,255,255,0.5);
-      color: #fff;
-    }
-
-    /* ── Hero ── */
-    .hero {
-      padding: 56px 40px 32px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .hero h1 {
-      margin: 0 0 6px;
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--ink);
-    }
-
-    .hero p {
-      margin: 0;
-      font-size: 15px;
-      color: var(--muted);
-    }
-
-    .hero-divider {
-      width: 48px;
-      height: 3px;
-      background: var(--lime);
-      border-radius: 99px;
-      margin: 16px 0 0;
-    }
-
-    /* ── App Grid ── */
-    .section-label {
-      max-width: 1200px;
-      margin: 32px auto 16px;
-      padding: 0 40px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .apps-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 40px 60px;
-    }
-
-    /* ── App Card ── */
-    .app-card {
-      display: flex;
-      flex-direction: column;
-      background: var(--white);
-      border-radius: 16px;
-      overflow: hidden;
-      text-decoration: none;
-      color: inherit;
-      box-shadow: var(--shadow-sm);
-      border: 1px solid rgba(16,42,67,0.07);
-      transition: transform 240ms cubic-bezier(0.2,0.8,0.2,1), box-shadow 240ms ease;
-      cursor: pointer;
-    }
-
-    .app-card:hover {
-      transform: translateY(-6px);
-      box-shadow: var(--shadow-hover);
-    }
-
-    .card-icon {
-      height: 120px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--card-gradient, linear-gradient(135deg, #1f7a78, #102a43));
-    }
-
-    .card-icon span {
-      width: 56px;
-      height: 56px;
-      background: rgba(255,255,255,0.2);
-      border: 2px solid rgba(255,255,255,0.4);
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-      font-weight: 800;
-      color: #fff;
-      backdrop-filter: blur(4px);
-    }
-
-    .card-info {
-      padding: 18px 20px 20px;
-    }
-
-    .card-info h3 {
-      margin: 0 0 8px;
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--ink);
-      line-height: 1.3;
-    }
-
-    .card-open {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--teal);
-      letter-spacing: 0.02em;
-    }
-
-    /* ── Empty State ── */
-    .empty-state {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 60px 40px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 15px;
-      line-height: 1.8;
-    }
-
-    .empty-state code {
-      background: #e8f0f7;
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-size: 13px;
-      color: var(--teal);
-    }
-
-    /* ── Footer ── */
-    .portal-footer {
-      text-align: center;
-      padding: 20px;
-      font-size: 11px;
-      color: var(--muted);
-      border-top: 1px solid rgba(16,42,67,0.08);
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 640px) {
-      .topbar { padding: 0 20px; }
-      .hero, .section-label, .apps-grid { padding-left: 20px; padding-right: 20px; }
-      .apps-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
-      .topbar-brand img { height: 30px; }
-      .user-name { display: none; }
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Topbar -->
-  <header class="topbar">
-    <div class="topbar-brand">
-      <img src="/images/microdata-logo.webp" alt="Microdata" />
-    </div>
-    <div class="topbar-user">
-      <div class="user-avatar">${getInitial(user.name || user.sub)}</div>
-      <span class="user-name">${user.name || user.sub}</span>
-      <form method="POST" action="/logout" style="margin:0;">
-        <button type="submit" class="logout-btn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
-            <polyline points="16 17 21 12 16 7"/>
-            <line x1="21" y1="12" x2="9" y2="12"/>
-          </svg>
-          Logout
-        </button>
-      </form>
-    </div>
-  </header>
-
-  <!-- Hero -->
-  <div class="hero">
-    <h1>Selamat datang, ${user.name || user.sub}! 👋</h1>
-    <p>Pilih aplikasi di bawah untuk mulai bekerja. Kamu tidak perlu login lagi di setiap aplikasi.</p>
-    <div class="hero-divider"></div>
-  </div>
-
-  <!-- Section label -->
-  <div class="section-label">Aplikasi yang Tersedia</div>
-
-  <!-- Apps Grid -->
-  <main class="apps-grid">
-    ${cards}
-    ${emptyState}
-  </main>
-
-  <!-- Footer -->
-  <footer class="portal-footer">
-    Microdata Identity Portal &middot; Sesi Anda terlindungi oleh Single Sign-On
-  </footer>
-
-</body>
-</html>`);
+  res.send(renderPortal({ cards, emptyState, user }));
 });
 
 // GET /login — Inisiasi OIDC flow

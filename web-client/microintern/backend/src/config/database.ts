@@ -101,6 +101,4 @@ const runMigrations = async () => {
   console.log("✅ Migration & seeding complete.");
 };
 
-runMigrations().catch((err) => {
-  console.error("❌ DB connection/migration failed:", err.stack);
-});
+export const databaseReady = runMigrations();

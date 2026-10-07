@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME:-microintern_db}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASS:-secret}
+    ports:
+      - "${DB_PORT:-5433}:5432"
+    volumes:
+      - microintern_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-microintern_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  minio:
+    image: docker.io/minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
+    ports:
+      - "${MINIO_PORT:-9002}:9000"
+      - "9003:9001"
+    volumes:
+      - microintern_minio_data:/data
+
+volumes:
+  microintern_db_data:
+  microintern_minio_data:

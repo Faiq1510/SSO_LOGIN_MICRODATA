@@ -1,0 +1,32 @@
+{
+  "name": "microdata Portal Aplikasi",
+  "short_name": "microdata Portal",
+  "description": "Portal terpusat untuk membuka aplikasi Microdata.",
+  "lang": "id-ID",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f0f4f8",
+  "theme_color": "#102a43",
+  "icons": [
+    {
+      "src": "/images/pwa-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/pwa-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/pwa-icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

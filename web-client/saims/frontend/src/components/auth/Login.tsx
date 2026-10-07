@@ -11,12 +11,14 @@ import Image from "next/image";
 import { authService } from "@/services/auth.service";
 import Cookies from "js-cookie";
 import { redirectToSSO } from "@/lib/sso";
+import { useSearchParams } from "next/navigation";
 
 interface LoginProps {
   onLoginSuccess: (token: string, user: any) => void;
 }
 
 export default function Login({ onLoginSuccess }: LoginProps) {
+  const searchParams = useSearchParams();
   const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,6 +46,16 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
   // Toast notification for successful reset password
   const [resetToast, setResetToast] = useState<string | null>(null);
+  const ssoRedirectStarted = React.useRef(false);
+
+  useEffect(() => {
+    if (searchParams.get("sso") !== "1" || ssoRedirectStarted.current) {
+      return;
+    }
+
+    ssoRedirectStarted.current = true;
+    void redirectToSSO();
+  }, [searchParams]);
 
   useEffect(() => {
     let toastTimer: NodeJS.Timeout;
