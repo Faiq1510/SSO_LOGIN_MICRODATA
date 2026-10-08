@@ -45,6 +45,7 @@ return [
     
     'sso' => [
     'issuer' => env('SSO_ISSUER'),
+    'internal_url' => env('SSO_INTERNAL_URL', env('SSO_ISSUER')),
     'client_id' => env('SSO_CLIENT_ID'),
     'client_secret' => env('SSO_CLIENT_SECRET'),
     'redirect_uri' => env('SSO_REDIRECT_URI'),

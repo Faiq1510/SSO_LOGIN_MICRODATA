@@ -57,7 +57,7 @@ class SsoController extends Controller
 
         $response = Http::asForm()
             ->withBasicAuth(config('services.sso.client_id'), config('services.sso.client_secret'))
-            ->post(config('services.sso.issuer') . '/oidc/token', [
+            ->post(config('services.sso.internal_url') . '/oidc/token', [
                 'grant_type' => 'authorization_code',
                 'code' => $request->query('code'),
                 'redirect_uri' => config('services.sso.redirect_uri'),

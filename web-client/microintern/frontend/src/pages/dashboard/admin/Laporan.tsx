@@ -20,7 +20,7 @@ const StarIcon = () => <Star className="w-5 h-5" />;
 const DownloadIcon = () => <Download className="w-4 h-4" />;
 const SpinnerIcon = () => <Loader2 className="w-4 h-4 animate-spin" />;
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5001/api";
 
 const REPORTS: ReportConfig[] = [
   {

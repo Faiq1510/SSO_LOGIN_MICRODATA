@@ -24,6 +24,9 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - WA_SERVER_URL=http://wa-server:3000
+      - SSO_INTERNAL_URL=${SSO_INTERNAL_URL:-http://host.docker.internal:3000}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       db:
         condition: service_healthy

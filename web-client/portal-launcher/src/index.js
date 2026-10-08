@@ -206,7 +206,7 @@ app.get("/", requireAuth, async (req, res) => {
             </div>
 
             <!-- Launch Button -->
-            <a href="${appUrl}" class="mt-5 w-full flex items-center justify-between px-4 py-2.5 bg-white/10 hover:bg-indigo-600 border border-white/15 hover:border-indigo-400 rounded-xl text-xs font-semibold text-white transition-all duration-200 shadow-md group/btn">
+            <a href="${appUrl}" class="app-launch mt-5 w-full flex items-center justify-between px-4 py-2.5 bg-white/10 hover:bg-indigo-600 border border-white/15 hover:border-indigo-400 rounded-xl text-xs font-semibold text-white transition-all duration-200 shadow-md group/btn">
               <span>Launch</span>
               <svg class="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>

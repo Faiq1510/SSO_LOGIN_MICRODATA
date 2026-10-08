@@ -14,6 +14,18 @@ info:
     | Arsip Surat | Laravel | 8000 | `client-arsip-surat` |
     | SiteFlow CPC | Laravel | 8001 | `cpc` |
 
+    ### URL Launch Portal (Development Local)
+    | Aplikasi | URL Launch |
+    |---|---|
+    | Arsip Surat | `http://localhost:8000/sso/login` |
+    | Microintern PKL | `http://localhost:5173/sso/start` |
+    | SiteFlow CPC | `http://localhost:8001/login/sso` |
+    | SAIMS Inventaris | `http://localhost:3002/login?sso=1` |
+
+    Browser-facing SSO menggunakan `http://localhost:3000`. Aplikasi di dalam
+    container menggunakan `http://host.docker.internal:3000` hanya untuk
+    komunikasi server-to-server; issuer dan redirect browser tetap lokal.
+
     ---
 
     ### Cara Kerja Alur Login SSO (Authorization Code Flow + PKCE)
@@ -136,14 +148,11 @@ info:
     ---
     ### URL Swagger UI
     - **Local**: http://localhost:3000/api-docs/
-    - **Staging**: https://procurer-uncouth-animate.ngrok-free.dev/api-docs/
 
   version: 1.0.0
 servers:
   - url: http://localhost:3000
     description: Development Local Server
-  - url: https://procurer-uncouth-animate.ngrok-free.dev
-    description: Ngrok Tunnel Server (Public Staging)
 
 tags:
   - name: Health Check
@@ -330,6 +339,8 @@ paths:
       tags:
         - Admin Management
       summary: Ambil daftar seluruh Pengguna SSO
+      security:
+        - AdminSessionCookie: []
       responses:
         '200':
           description: Daftar pengguna berhasil diambil
@@ -346,6 +357,8 @@ paths:
       tags:
         - Admin Management
       summary: Tambah Pengguna Baru ke SSO Provider
+      security:
+        - AdminSessionCookie: []
       requestBody:
         required: true
         content:
@@ -381,6 +394,8 @@ paths:
       tags:
         - Admin Management
       summary: Ambil daftar seluruh Client Terdaftar (Read-only)
+      security:
+        - AdminSessionCookie: []
       responses:
         '200':
           description: Daftar client berhasil dimuat
@@ -401,6 +416,11 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: Masukkan Access Token yang didapat dari endpoint /oidc/token
+    AdminSessionCookie:
+      type: apiKey
+      in: cookie
+      name: admin_session
+      description: Cookie sesi yang diterbitkan oleh POST /admin/login.
 
   schemas:
     TokenResponse:
@@ -408,7 +428,7 @@ components:
       properties:
         access_token:
           type: string
-          example: eyJhbGciOiJSUzI1NiIs...
+          example: access-token-placeholder
         token_type:
           type: string
           example: Bearer
@@ -417,7 +437,7 @@ components:
           example: 3600
         id_token:
           type: string
-          example: eyJhbGciOiJSUzI1NiIs...
+          example: id-token-placeholder
         scope:
           type: string
           example: openid profile email

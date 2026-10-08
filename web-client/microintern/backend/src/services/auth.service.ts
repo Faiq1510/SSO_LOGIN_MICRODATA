@@ -308,7 +308,7 @@ export const ssoLogin = async (ssoToken: string) => {
 };
 
 export const ssoOidcLogin = async (code: string, codeVerifier: string) => {
-  const ISSUER = process.env.SSO_ISSUER || "https://procurer-uncouth-animate.ngrok-free.dev";
+  const ISSUER = process.env.SSO_ISSUER || "http://localhost:3000";
   const CLIENT_ID = "client-microintern";
   const CLIENT_SECRET = process.env.SSO_SHARED_SECRET;
   const REDIRECT_URI = "http://localhost:5173/sso/callback";

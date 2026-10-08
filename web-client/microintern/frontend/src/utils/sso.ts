@@ -21,7 +21,7 @@ function generateRandomString(length: number = 32): string {
 }
 
 export async function redirectToSSO() {
-  const issuer = "https://procurer-uncouth-animate.ngrok-free.dev";
+  const issuer = "http://localhost:3000";
   const clientId = "client-microintern";
   const redirectUri = "http://localhost:5173/sso/callback";
 

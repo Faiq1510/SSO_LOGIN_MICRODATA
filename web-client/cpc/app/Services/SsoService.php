@@ -44,7 +44,7 @@ class SsoService
 
         $response = Http::asForm()
             ->withBasicAuth($this->clientId(), $this->clientSecret())
-            ->post(rtrim($this->issuer(), '/').'/oidc/token', [
+            ->post($this->internalIssuer().'/oidc/token', [
                 'grant_type' => 'authorization_code',
                 'code' => $code,
                 'redirect_uri' => $this->redirectUri(),
@@ -66,7 +66,7 @@ class SsoService
         if ($email === '' && is_string($response->json('access_token'))) {
             $userInfo = Http::withToken($response->json('access_token'))
                 ->withHeaders(['ngrok-skip-browser-warning' => 'true'])
-                ->get(rtrim($this->issuer(), '/').'/oidc/me')
+                ->get($this->internalIssuer().'/oidc/me')
                 ->json();
 
             if (is_array($userInfo)) {
@@ -132,7 +132,7 @@ class SsoService
 
         $jwks = Http::withHeaders([
             'ngrok-skip-browser-warning' => 'true',
-        ])->get(rtrim($this->issuer(), '/').'/oidc/jwks')->json('keys', []);
+        ])->get($this->internalIssuer().'/oidc/jwks')->json('keys', []);
         $jwk = collect($jwks)->firstWhere('kid', $header['kid'] ?? null);
         if (!is_array($jwk) || empty($jwk['n']) || empty($jwk['e'])) {
             throw new RuntimeException('Kunci publik SSO tidak ditemukan.');
@@ -211,6 +211,11 @@ class SsoService
     private function issuer(): string
     {
         return rtrim((string) env('SSO_ISSUER'), '/');
+    }
+
+    private function internalIssuer(): string
+    {
+        return rtrim((string) (env('SSO_INTERNAL_URL') ?: $this->issuer()), '/');
     }
 
     private function clientId(): string

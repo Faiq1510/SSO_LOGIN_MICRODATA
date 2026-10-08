@@ -48,39 +48,16 @@ document.addEventListener('DOMContentLoaded', () => {
     cardsTrack.addEventListener('scroll', updateSliderState, { passive: true });
     window.addEventListener('resize', updateSliderState);
 
-    // Mouse Drag to Scroll Left & Right
-    let isDown = false;
-    let startX;
-    let scrollLeftPos;
-
-    cardsTrack.addEventListener('pointerdown', (e) => {
-      if (e.pointerType === 'touch') return;
-      isDown = true;
-      cardsTrack.setPointerCapture(e.pointerId);
-      cardsTrack.classList.add('cursor-grabbing');
-      startX = e.clientX - cardsTrack.offsetLeft;
-      scrollLeftPos = cardsTrack.scrollLeft;
-    });
-    const stopDragging = (e) => {
-      isDown = false;
-      cardsTrack.classList.remove('cursor-grabbing');
-      if (e.pointerId !== undefined && cardsTrack.hasPointerCapture(e.pointerId)) {
-        cardsTrack.releasePointerCapture(e.pointerId);
-      }
-    };
-    cardsTrack.addEventListener('pointerup', stopDragging);
-    cardsTrack.addEventListener('pointercancel', stopDragging);
-    cardsTrack.addEventListener('pointermove', (e) => {
-      if (!isDown) return;
-      e.preventDefault();
-      const x = e.clientX - cardsTrack.offsetLeft;
-      const walk = (x - startX) * 2;
-      cardsTrack.scrollLeft = scrollLeftPos - walk;
-    });
-
     // Live Search Filter & Ctrl+K Shortcut
     const searchInput = document.getElementById('searchInput');
     const appCards = [...document.querySelectorAll('.app-card-item')];
+
+    document.addEventListener('click', (event) => {
+      const launchLink = event.target.closest('.app-launch');
+      if (!launchLink) return;
+      window.location.assign(launchLink.href);
+    }, true);
+
     const updateCards = () => {
       const query = searchInput.value.toLowerCase().trim();
       let visibleCount = 0;

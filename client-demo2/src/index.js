@@ -8,7 +8,7 @@ const PORT = 5000;
 
 // ==== Konfigurasi, sesuai entri "client-inventaris" di backend/src/oidc.js ====
 const IDP_ISSUER =
-  process.env.IDP_ISSUER || "https://procurer-uncouth-animate.ngrok-free.dev";
+  process.env.IDP_ISSUER || "http://localhost:3000";
 const CLIENT_ID = "client-inventaris";
 const CLIENT_SECRET = "secret-inventaris";
 const REDIRECT_URI = "http://localhost:5000/callback";
