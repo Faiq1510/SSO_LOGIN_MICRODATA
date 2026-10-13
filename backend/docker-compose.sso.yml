@@ -1,4 +1,15 @@
-# @format
+# docker-compose.sso.yml
+#
+# File ini adalah OVERRIDE untuk docker-compose.yml utama.
+# Digunakan ketika dua instance SSO perlu berjalan bersamaan di satu mesin
+# (misalnya: development dan testing berjalan paralel).
+#
+# Cara penggunaan:
+#   podman-compose -f docker-compose.yml -f docker-compose.sso.yml up -d
+#
+# Perbedaan dari docker-compose.yml utama:
+#   - App SSO berjalan di port 3001 (bukan 3000)
+#   - PostgreSQL berjalan di port 5433 (bukan 5432)
 
 services:
   app:

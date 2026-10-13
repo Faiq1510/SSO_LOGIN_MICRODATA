@@ -8,15 +8,16 @@ Repository ini berisi Identity Provider (IdP) berbasis OpenID Connect (OIDC), po
 LOGIN_SSO/
 ├─ backend/                    # SSO Identity Provider + PostgreSQL compose
 │  ├─ src/                     # OIDC provider, login, consent, admin API
-│  ├─ docker-compose.yml
-│  └─ docker-compose.sso.yml
-├─ frontend/                   # Template halaman login, consent, dan logout IdP
-├─ client-demo/                # Demo client SSO pertama
-├─ client-demo2/               # Demo client SSO kedua
+│  ├─ migrations/              # Skema database SQL
+│  ├─ scripts/                 # Migrasi dan seed data
+│  ├─ docker-compose.yml       # Setup utama (app + db)
+│  └─ docker-compose.sso.yml   # Override port untuk multi-instance
+├─ frontend/                   # Template halaman login, consent, logout, dan admin dashboard IdP
+│  └─ admin-dashboard/         # Admin Dashboard PWA (HTML/CSS/JS)
 └─ web-client/
-   ├─ portal-launcher/         # Portal daftar aplikasi
+   ├─ portal-launcher/         # Portal daftar aplikasi SSO (Node.js + PWA)
    ├─ cpc/                     # Aplikasi CPC (Laravel)
-   ├─ microintern/             # Backend + frontend Microintern
+   ├─ microintern/             # Backend + frontend Microintern (Node.js + Vite/React)
    ├─ saims/                   # Backend Go + frontend Next.js SAIMS
    └─ surat-penomoran/         # Aplikasi Surat Penomoran (Laravel)
 ```

@@ -24,6 +24,8 @@ web-client/cpc/vendor/
 web-client/surat-penomoran/vendor/
 
 # Local tunnel binaries and backups
+ngrok.exe
+ngrok
 *.old
 *.bak
 *.backup

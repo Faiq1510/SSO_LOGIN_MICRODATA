@@ -1,106 +1,129 @@
-// User Menu Popover Toggle
+/**
+ * Portal Launcher Client-Side JavaScript
+ */
+
 document.addEventListener('DOMContentLoaded', () => {
-    const userMenuBtn = document.getElementById('userMenuBtn');
-    const userDropdown = document.getElementById('userDropdown');
+  // ─── 1. User Dropdown Menu Popover ───
+  const userMenuBtn = document.getElementById('userMenuBtn');
+  const userDropdown = document.getElementById('userDropdown');
+
+  if (userMenuBtn && userDropdown) {
     userMenuBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       userDropdown.classList.toggle('hidden');
     });
+
     document.addEventListener('click', () => {
       userDropdown.classList.add('hidden');
     });
+  }
 
-    // Fullscreen Toggle
-    function toggleFullScreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => console.log(err));
-      } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-      }
-    }
+  // ─── 2. Horizontal Scroll Slider Controls ───
+  const cardsTrack = document.getElementById('cardsTrack');
+  const slideLeft = document.getElementById('slideLeft');
+  const slideRight = document.getElementById('slideRight');
+  const scrollIndicator = document.getElementById('scrollIndicator');
 
-    // Horizontal Scroll Slider (Left / Right Arrow Navigation)
-    const cardsTrack = document.getElementById('cardsTrack');
-    const slideLeft = document.getElementById('slideLeft');
-    const slideRight = document.getElementById('slideRight');
-    const scrollIndicator = document.getElementById('scrollIndicator');
+  const scrollAmount = 300;
 
-    const scrollAmount = () => Math.max(cardsTrack.clientWidth * 0.85, 240);
+  if (slideLeft && cardsTrack) {
     slideLeft.addEventListener('click', () => {
-      cardsTrack.scrollBy({ left: -scrollAmount(), behavior: 'smooth' });
+      cardsTrack.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
     });
+  }
+
+  if (slideRight && cardsTrack) {
     slideRight.addEventListener('click', () => {
-      cardsTrack.scrollBy({ left: scrollAmount(), behavior: 'smooth' });
+      cardsTrack.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     });
+  }
 
-    const updateSliderState = () => {
+  // Bottom Scroll Progress Indicator Update
+  if (cardsTrack && scrollIndicator) {
+    cardsTrack.addEventListener('scroll', () => {
       const maxScroll = cardsTrack.scrollWidth - cardsTrack.clientWidth;
-      const canScroll = maxScroll > 1;
-      const percentage = canScroll ? cardsTrack.scrollLeft / maxScroll : 0;
-      const maxTranslate = 28;
-      cardsTrack.classList.toggle('justify-center', !canScroll);
-      cardsTrack.classList.toggle('justify-start', canScroll);
-      scrollIndicator.style.transform = `translateX(${percentage * maxTranslate}px)`;
-      scrollIndicator.parentElement.parentElement.classList.toggle('hidden', !canScroll);
-      slideLeft.disabled = !canScroll || cardsTrack.scrollLeft <= 1;
-      slideRight.disabled = !canScroll || cardsTrack.scrollLeft >= maxScroll - 1;
-    };
-    cardsTrack.addEventListener('scroll', updateSliderState, { passive: true });
-    window.addEventListener('resize', updateSliderState);
-
-    // Live Search Filter & Ctrl+K Shortcut
-    const searchInput = document.getElementById('searchInput');
-    const appCards = [...document.querySelectorAll('.app-card-item')];
-
-    document.addEventListener('click', (event) => {
-      const launchLink = event.target.closest('.app-launch');
-      if (!launchLink) return;
-      window.location.assign(launchLink.href);
-    }, true);
-
-    const updateCards = () => {
-      const query = searchInput.value.toLowerCase().trim();
-      let visibleCount = 0;
-      appCards.forEach(card => {
-        const matchesSearch = card.dataset.title.includes(query);
-        const visible = matchesSearch;
-        card.hidden = !visible;
-        if (visible) visibleCount += 1;
-      });
-      cardsTrack.scrollTo({ left: 0, behavior: 'auto' });
-      updateSliderState();
-      searchInput.setAttribute('aria-label', `${visibleCount} aplikasi ditemukan`);
-    };
-
-    document.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
-        searchInput.focus();
+      if (maxScroll > 0) {
+        const percentage = cardsTrack.scrollLeft / maxScroll;
+        const indicatorWidth = 32; // px
+        const trackWidth = 64;    // px container
+        const maxTranslate = trackWidth - indicatorWidth - 4;
+        scrollIndicator.style.transform = `translateX(${percentage * maxTranslate}px)`;
       }
     });
+  }
 
-    searchInput.addEventListener('input', () => {
-      updateCards();
+  // ─── 3. Mouse Drag to Scroll Left & Right ───
+  if (cardsTrack) {
+    let isDown = false;
+    let startX;
+    let scrollLeftPos;
+
+    cardsTrack.addEventListener('mousedown', (e) => {
+      isDown = true;
+      startX = e.pageX - cardsTrack.offsetLeft;
+      scrollLeftPos = cardsTrack.scrollLeft;
     });
 
-    cardsTrack.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        cardsTrack.scrollBy({ left: -scrollAmount(), behavior: 'smooth' });
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        cardsTrack.scrollBy({ left: scrollAmount(), behavior: 'smooth' });
-      }
+    cardsTrack.addEventListener('mouseleave', () => { isDown = false; });
+    cardsTrack.addEventListener('mouseup', () => { isDown = false; });
+    cardsTrack.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - cardsTrack.offsetLeft;
+      const walk = (x - startX) * 2;
+      cardsTrack.scrollLeft = scrollLeftPos - walk;
     });
+  }
 
-    updateCards();
+  // ─── 4. Live Search Filter & Ctrl+K Keyboard Shortcut ───
+  const searchInput = document.getElementById('searchInput');
+  const appCards = document.querySelectorAll('.app-card-item');
 
-    // Service Worker Registration
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/service-worker.js").catch((error) => {
-          console.error("Service worker portal gagal didaftarkan:", error);
-        });
-      });
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      if (searchInput) searchInput.focus();
     }
+  });
+
+  if (searchInput && appCards.length > 0) {
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      appCards.forEach(card => {
+        const title = card.getAttribute('data-title') || '';
+        card.style.display = title.includes(query) ? 'block' : 'none';
+      });
+    });
+  }
+
+  // ─── 5. Filter Tabs (Website vs Mobile) ───
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => {
+        b.classList.remove('active', 'bg-white/20', 'border', 'border-white/20', 'text-white');
+        b.classList.add('text-slate-300');
+      });
+      btn.classList.add('active', 'bg-white/20', 'border', 'border-white/20', 'text-white');
+      btn.classList.remove('text-slate-300');
+    });
+  });
+
+  // ─── 6. Service Worker Registration ───
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js').catch((error) => {
+        console.error('Service worker portal gagal didaftarkan:', error);
+      });
+    });
+  }
 });
+
+// Fullscreen Toggle (Global)
+function toggleFullScreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(err => console.log(err));
+  } else {
+    if (document.exitFullscreen) document.exitFullscreen();
+  }
+}
