@@ -106,8 +106,13 @@ jobs:
           # Uji endpoint well-known OIDC configuration
           curl --fail http://localhost:3000/oidc/.well-known/openid-configuration || exit 1
 
+           # Uji keamanan endpoint admin (harus tolak akses tanpa token dengan status 401)
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/admin/users)
+          echo "Status response /admin/users: $HTTP_CODE"
+          if [ "$HTTP_CODE" -ne 401 ]; then
+            echo "Expected 401 Unauthorized, but got $HTTP_CODE"
+            exit 1
+          fi
+
           # Matikan server kembali
           kill $SERVER_PID
-
-          #test untuk endpoint /admin/login
-          curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/admin/users | grep -E "401|200" || exit 1
