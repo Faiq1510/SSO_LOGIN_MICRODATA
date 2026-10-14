@@ -60,6 +60,11 @@ jobs:
           DB_PASSWORD: sso_password
         run: npm run migrate
 
+      - name: Syntax Check Portal Launcher
+        working-directory: web-client/portal-launcher
+        run: |
+          node --check src/index.js
+
       - name: Run Database Seeding
         working-directory: backend
         env:
@@ -103,3 +108,6 @@ jobs:
 
           # Matikan server kembali
           kill $SERVER_PID
+
+          #test untuk endpoint /admin/login
+          curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/admin/users | grep -E "401|200" || exit 1
