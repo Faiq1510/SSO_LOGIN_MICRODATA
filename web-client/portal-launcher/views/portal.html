@@ -66,7 +66,7 @@
             />
           </div>
           <span
-            class="text-white font-extrabold text-sm sm:text-base md:text-lg tracking-wider uppercase truncate"
+            class="text-xs sm:text-base font-extrabold tracking-wider truncate"
             >MICRODATA PORTAL APP</span
           >
         </div>
@@ -74,9 +74,9 @@
         <!-- Right: Controls & User Profile -->
         <div class="flex shrink-0 items-center gap-2 sm:gap-3">
           <!-- Live Search Box -->
-          <div class="relative w-32 sm:w-44 md:w-56">
+          <div class="relative w-28 sm:w-44 md:w-56">
             <svg
-              class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              class="w-3.5 h-3.5 sm:w-4 sm:h-4 absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 text-slate-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -92,8 +92,8 @@
               type="text"
               id="searchInput"
               aria-label="Cari aplikasi"
-              placeholder="Search apps..."
-              class="w-full bg-white/10 hover:bg-white/15 focus:bg-slate-900/80 text-white placeholder-slate-400 text-xs font-medium pl-9 pr-14 py-2.5 rounded-xl border border-white/15 focus:border-indigo-400 focus:outline-none transition-all"
+              placeholder="Search..."
+              class="w-full bg-white/10 hover:bg-white/15 focus:bg-slate-900/80 text-white placeholder-slate-400 text-[11px] sm:text-xs font-medium pl-8 sm:pl-9 pr-3 sm:pr-14 py-2 rounded-xl border border-white/15 focus:border-indigo-400 focus:outline-none transition-all"
             />
             <div
               class="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none"
@@ -109,11 +109,11 @@
             </div>
           </div>
 
-          <!-- Fullscreen Button -->
+          <!-- Fullscreen Button (Hidden on Mobile) -->
           <button
             onclick="toggleFullScreen()"
             title="Toggle Fullscreen"
-            class="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-slate-200 hover:text-white transition-all"
+            class="hidden sm:flex p-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-slate-200 hover:text-white transition-all items-center justify-center"
           >
             <svg
               class="w-4 h-4"
@@ -133,7 +133,7 @@
           <!-- Notification Bell -->
           <button
             title="Notifikasi"
-            class="relative p-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-slate-200 hover:text-white transition-all"
+            class="p-2 sm:p-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-slate-200 hover:text-white transition-all flex items-center justify-center"
           >
             <svg
               class="w-4 h-4"
@@ -235,7 +235,7 @@
             type="button"
             id="slideLeft"
             aria-label="Geser aplikasi ke kiri"
-            class="absolute left-1 sm:-left-4 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 rounded-full bg-slate-900/90 text-white border border-white/20 backdrop-blur-md transition-opacity shadow-2xl hover:scale-110 disabled:opacity-30 disabled:pointer-events-none"
+            class="hidden md:flex absolute -left-5 lg:-left-7 top-1/2 -translate-y-1/2 z-30 w-11 h-11 items-center justify-center rounded-full bg-slate-900/90 hover:bg-indigo-600 text-white border border-white/20 hover:border-indigo-400 backdrop-blur-md shadow-2xl transition-all duration-200 hover:scale-110 active:scale-95 disabled:opacity-20 disabled:pointer-events-none cursor-pointer"
           >
             <svg
               class="w-5 h-5"
@@ -257,7 +257,7 @@
             id="cardsTrack"
             tabindex="0"
             aria-label="Daftar aplikasi"
-            class="flex justify-start gap-4 sm:gap-5 md:gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-none scroll-smooth pb-4 pt-2 px-1 cursor-grab active:cursor-grabbing select-none touch-pan-x"
+            class="flex justify-start xl:justify-center items-center gap-5 sm:gap-6 md:gap-7 overflow-x-auto snap-x snap-mandatory scrollbar-none scroll-smooth py-6 px-4 sm:px-8 cursor-grab active:cursor-grabbing select-none touch-pan-x"
           >
             {{CARDS}} {{EMPTY_STATE}}
           </div>
@@ -267,7 +267,7 @@
             type="button"
             id="slideRight"
             aria-label="Geser aplikasi ke kanan"
-            class="absolute right-1 sm:-right-4 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 rounded-full bg-slate-900/90 text-white border border-white/20 backdrop-blur-md transition-opacity shadow-2xl hover:scale-110 disabled:opacity-30 disabled:pointer-events-none"
+            class="hidden md:flex absolute -right-5 lg:-right-7 top-1/2 -translate-y-1/2 z-30 w-11 h-11 items-center justify-center rounded-full bg-slate-900/90 hover:bg-indigo-600 text-white border border-white/20 hover:border-indigo-400 backdrop-blur-md shadow-2xl transition-all duration-200 hover:scale-110 active:scale-95 disabled:opacity-20 disabled:pointer-events-none cursor-pointer"
           >
             <svg
               class="w-5 h-5"

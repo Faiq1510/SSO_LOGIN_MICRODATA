@@ -24,7 +24,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const slideRight = document.getElementById('slideRight');
   const scrollIndicator = document.getElementById('scrollIndicator');
 
-  const scrollAmount = 300;
+  const scrollAmount = 320;
+
+  function updateScrollButtons() {
+    if (!cardsTrack) return;
+    const maxScroll = cardsTrack.scrollWidth - cardsTrack.clientWidth;
+    if (slideLeft) {
+      slideLeft.disabled = cardsTrack.scrollLeft <= 10;
+    }
+    if (slideRight) {
+      slideRight.disabled = cardsTrack.scrollLeft >= maxScroll - 10;
+    }
+  }
 
   if (slideLeft && cardsTrack) {
     slideLeft.addEventListener('click', () => {
@@ -38,11 +49,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Bottom Scroll Progress Indicator Update
-  if (cardsTrack && scrollIndicator) {
+  // Izinkan scroll samping menggunakan scroll wheel mouse
+  if (cardsTrack) {
+    cardsTrack.addEventListener('wheel', (e) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        cardsTrack.scrollBy({ left: e.deltaY * 1.5, behavior: 'smooth' });
+      }
+    }, { passive: false });
+
     cardsTrack.addEventListener('scroll', () => {
+      updateScrollButtons();
       const maxScroll = cardsTrack.scrollWidth - cardsTrack.clientWidth;
-      if (maxScroll > 0) {
+      if (maxScroll > 0 && scrollIndicator) {
         const percentage = cardsTrack.scrollLeft / maxScroll;
         const indicatorWidth = 32; // px
         const trackWidth = 64;    // px container
@@ -50,6 +69,10 @@ document.addEventListener('DOMContentLoaded', () => {
         scrollIndicator.style.transform = `translateX(${percentage * maxTranslate}px)`;
       }
     });
+
+    window.addEventListener('load', updateScrollButtons);
+    window.addEventListener('resize', updateScrollButtons);
+    setTimeout(updateScrollButtons, 300);
   }
 
   // ─── 3. Mouse Drag to Scroll Left & Right ───

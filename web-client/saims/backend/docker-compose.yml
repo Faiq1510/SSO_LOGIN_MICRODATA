@@ -15,7 +15,7 @@ services:
     restart: always
 
   minio:
-    image: docker.io/minio/minio:latest
+    image: docker.io/minio/minio/latest
     container_name: saims_minio
     environment:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}

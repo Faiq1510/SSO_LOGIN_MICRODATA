@@ -95,7 +95,12 @@ app.use(express.static(path.join(__dirname, "../public")));
 
 // Helper untuk metadata aplikasi (Icon SVG, Role, Deskripsi)
 function getAppMetadata(app) {
-  const name = (app.client_name || app.name || app.client_id || "").toLowerCase();
+  const name = (
+    app.client_name ||
+    app.name ||
+    app.client_id ||
+    ""
+  ).toLowerCase();
 
   if (name.includes("surat") || name.includes("arsip")) {
     return {
@@ -103,15 +108,19 @@ function getAppMetadata(app) {
       roles: ["Admin", "Supervisor"],
       logoSvg: `<svg class="w-16 h-16 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`,
       brandTitle: "ARSIP SURAT",
-      shortDesc: "Penomoran & Tata Kelola Surat"
+      shortDesc: "Penomoran & Tata Kelola Surat",
     };
-  } else if (name.includes("intern") || name.includes("pkl") || name.includes("microintern")) {
+  } else if (
+    name.includes("intern") ||
+    name.includes("pkl") ||
+    name.includes("microintern")
+  ) {
     return {
       category: "Website",
       roles: ["Admin", "Peserta"],
       logoSvg: `<svg class="w-16 h-16 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>`,
       brandTitle: "MICROINTERN PKL",
-      shortDesc: "Portal Manajamen Magang & PKL"
+      shortDesc: "Portal Manajamen Magang & PKL",
     };
   } else if (name.includes("cpc") || name.includes("siteflow")) {
     return {
@@ -119,15 +128,19 @@ function getAppMetadata(app) {
       roles: ["Admin", "Operator"],
       logoSvg: `<svg class="w-16 h-16 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>`,
       brandTitle: "SITEFLOW CPC",
-      shortDesc: "Logistik & Cash Processing Center"
+      shortDesc: "Logistik & Cash Processing Center",
     };
-  } else if (name.includes("saims") || name.includes("inventaris") || name.includes("asset")) {
+  } else if (
+    name.includes("saims") ||
+    name.includes("inventaris") ||
+    name.includes("asset")
+  ) {
     return {
       category: "Website",
       roles: ["Admin", "Staff"],
       logoSvg: `<svg class="w-16 h-16 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>`,
       brandTitle: "SAIMS INVENTARIS",
-      shortDesc: "Peminjaman & Inventaris Aset"
+      shortDesc: "Peminjaman & Inventaris Aset",
     };
   }
 
@@ -135,11 +148,15 @@ function getAppMetadata(app) {
     category: "Website",
     roles: ["Admin"],
     logoSvg: `<svg class="w-16 h-16 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>`,
-    brandTitle: (app.client_name || app.name || app.client_id || "APLIKASI").toUpperCase(),
-    shortDesc: "Aplikasi Terintegrasi SSO"
+    brandTitle: (
+      app.client_name ||
+      app.name ||
+      app.client_id ||
+      "APLIKASI"
+    ).toUpperCase(),
+    shortDesc: "Aplikasi Terintegrasi SSO",
   };
 }
-
 
 function renderPortal({ cards, emptyState, user }) {
   const templatePath = path.join(__dirname, "../views/portal.html");
@@ -174,41 +191,44 @@ app.get("/", requireAuth, async (req, res) => {
       const meta = getAppMetadata(app);
       const appUrl = app.app_url;
       const roleBadges = meta.roles
-        .map(r => `<span class="bg-white/15 text-white/90 text-[11px] font-medium px-2.5 py-0.5 rounded-md border border-white/10">${r}</span>`)
+        .map(
+          (r) =>
+            `<span class="bg-white/15 text-white/90 text-[11px] font-medium px-2.5 py-0.5 rounded-md border border-white/10">${r}</span>`,
+        )
         .join(" ");
 
       return `
-      <div class="app-card-item flex-shrink-0 w-[calc(100vw-3rem)] max-w-80 sm:w-80 md:w-72 snap-start group" data-category="${meta.category.toLowerCase()}" data-title="${displayName.toLowerCase()} ${meta.brandTitle.toLowerCase()} ${meta.shortDesc.toLowerCase()}">
+      <div class="app-card-item flex-shrink-0 w-[78vw] max-w-[270px] sm:w-72 md:w-80 snap-center group" data-category="${meta.category.toLowerCase()}" data-title="${displayName.toLowerCase()} ${meta.brandTitle.toLowerCase()} ${meta.shortDesc.toLowerCase()}">
         <div class="bg-gradient-to-b from-white/15 to-white/5 backdrop-blur-xl border border-white/15 rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 transform hover:-translate-y-2 hover:shadow-indigo-500/20 hover:border-white/30 flex flex-col h-full">
-          <!-- Upper White Box Container for Logo -->
-          <div class="h-44 bg-white p-6 flex flex-col items-center justify-center relative overflow-hidden group-hover:bg-slate-50 transition-colors">
-            <div class="transform group-hover:scale-110 transition-transform duration-300">
+          <!-- Upper White Box Container for Logo (Lebih compact di HP: h-32, di desktop: sm:h-40) -->
+          <div class="h-32 sm:h-40 bg-white p-4 sm:p-5 flex flex-col items-center justify-center relative overflow-hidden group-hover:bg-slate-50 transition-colors">
+            <div class="transform scale-90 sm:scale-100 group-hover:scale-110 transition-transform duration-300">
               ${meta.logoSvg}
             </div>
-            <div class="mt-3 font-extrabold text-sm tracking-widest text-slate-800 uppercase text-center truncate w-full px-2">
+            <div class="mt-2 font-extrabold text-xs sm:text-sm tracking-wider text-slate-800 uppercase text-center truncate w-full px-2">
               ${meta.brandTitle}
             </div>
           </div>
 
           <!-- Lower Dark Glass Info & Actions -->
-          <div class="p-5 flex-1 flex flex-col justify-between bg-slate-950/40 backdrop-blur-md">
+          <div class="p-3.5 sm:p-4 md:p-5 flex-1 flex flex-col justify-between bg-slate-950/40 backdrop-blur-md">
             <div>
-              <h3 class="text-white font-bold text-sm tracking-wide mb-1 uppercase truncate" title="${displayName}">
+              <h3 class="text-white font-bold text-xs sm:text-sm tracking-wide mb-0.5 sm:mb-1 uppercase truncate" title="${displayName}">
                 ${displayName}
               </h3>
-              <p class="text-xs text-slate-400 mb-3 line-clamp-1">${meta.shortDesc}</p>
+              <p class="text-[11px] sm:text-xs text-slate-400 mb-2 sm:mb-3 line-clamp-1">${meta.shortDesc}</p>
               
               <!-- Roles Badges -->
-              <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="text-[11px] text-slate-400 font-medium">Role:</span>
+              <div class="flex items-center gap-1 sm:gap-1.5 flex-wrap">
+                <span class="text-[10px] sm:text-[11px] text-slate-400 font-medium">Role:</span>
                 ${roleBadges}
               </div>
             </div>
 
-            <!-- Launch Button -->
-            <a href="${appUrl}" class="app-launch mt-5 w-full flex items-center justify-between px-4 py-2.5 bg-white/10 hover:bg-indigo-600 border border-white/15 hover:border-indigo-400 rounded-xl text-xs font-semibold text-white transition-all duration-200 shadow-md group/btn">
+            <!-- Launch Button (Compact di HP: py-2, desktop: py-2.5) -->
+            <a href="${appUrl}" class="app-launch mt-3.5 sm:mt-5 w-full flex items-center justify-between px-3.5 sm:px-4 py-2 sm:py-2.5 bg-white/10 hover:bg-indigo-600 border border-white/15 hover:border-indigo-400 rounded-xl text-xs font-semibold text-white transition-all duration-200 shadow-md group/btn">
               <span>Launch</span>
-              <svg class="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 transform group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
               </svg>
             </a>
